@@ -1,14 +1,16 @@
 import express from 'express'
-import path from 'path'
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import type { Request, Response } from 'express'
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.static(path.join(__dirname, '../client')));
+app.use(express.static('client'));
+
+app.get('/', (req: Request, res: Response) => {
+//   console.log('request received', req);
+//   res.send('Hello World!');
+    res.sendFile('index.html', { root: 'client' });
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
