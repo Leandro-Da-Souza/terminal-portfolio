@@ -1,5 +1,6 @@
 import type { TerminalEntry } from '../types/terminal';
 import type { ParsedCommand } from '../types/command';
+import { CommandRegistry } from '../commands/registry';
 
 class TerminalWindow extends HTMLElement {
     constructor() {
@@ -9,6 +10,7 @@ class TerminalWindow extends HTMLElement {
     
     connectedCallback() {
         this.render();
+        this.attachEventListeners();
     }
     
     private history: TerminalEntry[] = [];
@@ -20,8 +22,6 @@ class TerminalWindow extends HTMLElement {
             ${this.styles()}
             ${this.markup()}
         `;
-
-        this.attachEventListeners();
     }
 
     protected styles(): string {
@@ -80,26 +80,46 @@ class TerminalWindow extends HTMLElement {
 
         // Listen for command events from the input
         this.shadowRoot?.addEventListener('command', (event: Event) => {
-            const customEvent = event as CustomEvent<ParsedCommand>;
+            const customEvent = event as CustomEvent;
             const command = customEvent.detail;
-            this.handleCommandListener(command);
+            this.commandHandler(command);
         });
-
     }
 
-    private handleCommandListener(command: ParsedCommand): void {
-        // Implement command parsing and execution logic here
-        const { input, output } = this.parseTerminalEntry(command);
-
-        this.history.push({ input, output });
-        // Update the terminal display with the new output
+    private commandHandler(command: string): void {
+        const parsedCommand = this.parseCommand(command);
+    
+        const output = this.executeCommand(parsedCommand);
+    
+        this.addTerminalEntry(parsedCommand, output);
+    
         this.render();
     }
 
-    private parseTerminalEntry(command: ParsedCommand): TerminalEntry {
-        // Implement command parsing logic here
-        const output = `Executed command: ${command.name}`; // Placeholder output
-        return { input: command.name, output };
+    private parseCommand(command: string): ParsedCommand {
+        const [name, ...args] = command.split(' ');
+        return { name, args };
+    }
+
+    private executeCommand(parsedCommand: ParsedCommand): string {
+        const commandDef = CommandRegistry[parsedCommand.name] || CommandRegistry['default'];
+        return commandDef.execute(parsedCommand.args);
+    }
+
+    private addTerminalEntry(
+        parsedCommand: ParsedCommand,
+        output: string
+    ): void {
+    
+        const input = [
+            parsedCommand.name,
+            ...(parsedCommand.args || [])
+        ].join(' ');
+    
+        this.history.push({
+            input,
+            output
+        });
     }
 
 }

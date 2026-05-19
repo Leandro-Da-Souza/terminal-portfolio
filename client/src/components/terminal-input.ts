@@ -1,5 +1,3 @@
-import type { ParsedCommand } from '../types/command';
-
 class TerminalInput extends HTMLElement {
     constructor() {
         super();
@@ -8,6 +6,7 @@ class TerminalInput extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        this.attachEventHandlers();
     }
 
     protected render(): void {
@@ -17,8 +16,6 @@ class TerminalInput extends HTMLElement {
             ${this.styles()}
             ${this.markup()}
         `;
-
-        this.attachEventHandlers();
     }
 
     protected styles(): string {
@@ -57,23 +54,17 @@ class TerminalInput extends HTMLElement {
             if (event.key === 'Enter') {
                 const command = commandInput.value.trim();
                 if (command) {
-                    this.handleCommand(command);
+                    this.dispatchCommand(command);
                 }
                 commandInput.value = '';
+                commandInput.focus();
             }
         });
     }
-    
-    private parseCommand(command: string): ParsedCommand {
-        const [name, ...args] = command.split(' ');
-        return { name, args };
-    }
 
-    private handleCommand(command: string): void {
-        const parsedCommand: ParsedCommand = this.parseCommand(command);
-        this.dispatchEvent(new CustomEvent('command', { detail: parsedCommand, bubbles: true, composed: true }));
+    private dispatchCommand(command: string): void {
+        this.dispatchEvent(new CustomEvent('command', { detail: command, bubbles: true, composed: true }));
     }
-
 
 }
 

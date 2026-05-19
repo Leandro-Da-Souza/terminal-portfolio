@@ -6,6 +6,7 @@ class TerminalHeader extends HTMLElement {
 
     connectedCallback() {
         this.render()
+        this.attachEventHandlers();
     }
 
     protected render(): void {
@@ -16,7 +17,6 @@ class TerminalHeader extends HTMLElement {
             ${this.markup()}
         `;
 
-        this.attachEventHandlers();
     }
 
     protected styles(): string {
