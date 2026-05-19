@@ -1,3 +1,6 @@
+import type { TerminalEntry } from '../types/terminal';
+import type { ParsedCommand } from '../types/command';
+
 class TerminalWindow extends HTMLElement {
     constructor() {
         super();
@@ -7,6 +10,8 @@ class TerminalWindow extends HTMLElement {
     connectedCallback() {
         this.render();
     }
+    
+    private history: TerminalEntry[] = [];
 
     protected render(): void {
         if (!this.shadowRoot) return;
@@ -16,6 +21,7 @@ class TerminalWindow extends HTMLElement {
             ${this.markup()}
         `;
 
+        this.attachEventHandlers();
         this.attachEventListeners();
     }
 
@@ -28,37 +34,7 @@ class TerminalWindow extends HTMLElement {
                     font-family: 'Courier New', Courier, monospace;
                     width: 100dvw;
                     height: 100dvh;
-                }
-                header {
-                    background-color: #333;
-                    display: flex;
-                    justify-content: space-between;
-                    width: 100%;
-                }
-                .title {
-                    width: 100%;
-                    margin: 0;
-                    padding: 0;
-                }
-                .controls {
-                    display: inline-flex;
-                    gap: 0.5em;
-                    justify-content: flex-end;
-                    width: 100%;
-                    margin: 0.1em 0.5em;
-                }
-                .controls span {
-                    cursor: pointer;
-                    width: 1.5em;
-                    height: 1.5em;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    background-color: #444;
-                    border-radius: 0.25em;
-                }
-                .controls span:hover {
-                    background-color: #555;
+                    overflow: hidden;
                 }
                 .command-input {
                     width: 100%;
@@ -77,15 +53,8 @@ class TerminalWindow extends HTMLElement {
     protected markup(): string {
         return `
             <section class="terminal-window">
-                <header>
-                    <h3 class="title">Terminal Portfolio</h3>
-                    <section class="controls">
-                        <span class="maximize">+</span>
-                        <span class="minimize">_</span>
-                        <span class="close">x</span>
-                    </section>
-                </header>
                 <main>
+                    <terminal-header></terminal-header>
                     <section class="content">
                         <p>Type 'help' to see available commands.</p>
                         <input type="text" class="command-input" placeholder="Enter command..." autofocus />
@@ -95,11 +64,27 @@ class TerminalWindow extends HTMLElement {
         `;
     }
 
-    protected attachEventListeners(): void {
+    protected attachEventHandlers(): void {
         this.commandHandler();
-        this.maximize();
-        this.minimize();
-        this.close();
+    }
+
+    protected attachEventListeners(): void {
+        // Listen for minimize and close events from the header
+        this.shadowRoot?.addEventListener('minimize', () => {
+            console.log('Minimize event received');
+            // Implement minimize logic here
+        });
+
+        this.shadowRoot?.addEventListener('maximize', () => {
+            console.log('Maximize event received');
+            // Implement maximize logic here
+        });
+
+        this.shadowRoot?.addEventListener('close', () => {
+            console.log('Close event received');
+            // Implement close logic here
+        });
+
     }
 
     private commandHandler(): void {
@@ -108,38 +93,29 @@ class TerminalWindow extends HTMLElement {
         commandInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 const command = commandInput.value.trim();
-                console.log('Command entered:', command);
-                // Here you can implement command handling logic
+                if (command) {
+                    this.handleCommand(command);
+                }
                 commandInput.value = '';
             }
         });
     }
 
-    private maximize(): void {
-        // Implement maximize functionality
-        this.shadowRoot?.querySelector('.controls .maximize')?.addEventListener('click', () => {
-            const terminal = this.shadowRoot?.querySelector('.terminal-window');
-            console.log('Maximize clicked');
-            console.log(terminal)
-        });
+    private handleCommand(command: string): void {
+        // Implement command parsing and execution logic here
+        const parsedCommand: ParsedCommand = this.parseCommand(command);
+        console.log('Parsed Command:', parsedCommand);
+
+        // Execute the command and update history
+        const output = `Executed command: ${parsedCommand.name}`;
+        this.history.push({ input: command, output });
+        console.log('Command history:', this.history);
+        // Update the terminal display with the new output
     }
 
-    private minimize(): void {
-        // Implement minimize functionality
-        this.shadowRoot?.querySelector('.controls .minimize')?.addEventListener('click', () => {
-            const terminal = this.shadowRoot?.querySelector('.terminal-window');
-            console.log('Minimize clicked');
-            console.log(terminal)
-        });
-    }
-
-    private close(): void {
-        // Implement close functionality
-        this.shadowRoot?.querySelector('.controls .close')?.addEventListener('click', () => {
-            const terminal = this.shadowRoot?.querySelector('.terminal-window');
-            console.log('Close clicked');
-            console.log(terminal)
-        });
+    private parseCommand(command: string): ParsedCommand {
+        const [name, ...args] = command.split(' ');
+        return { name, args };
     }
 }
 
