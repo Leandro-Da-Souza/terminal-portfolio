@@ -21,7 +21,6 @@ class TerminalWindow extends HTMLElement {
             ${this.markup()}
         `;
 
-        this.attachEventHandlers();
         this.attachEventListeners();
     }
 
@@ -32,20 +31,10 @@ class TerminalWindow extends HTMLElement {
                     background-color: #222;
                     color: #0f0;
                     font-family: 'Courier New', Courier, monospace;
-                    width: 100dvw;
-                    height: 100dvh;
+                    min-width: 100dvw;
+                    min-height: 100dvh;
                     overflow: hidden;
                 }
-                .command-input {
-                    width: 100%;
-                    background-color: transparent;
-                    border: none;
-                    color: #0f0;
-                    font-family: 'Courier New', Courier, monospace;
-                }
-                .command-input:focus {
-                    outline: none;
-                }   
             </style>
         `;
     }
@@ -56,16 +45,20 @@ class TerminalWindow extends HTMLElement {
                 <main>
                     <terminal-header></terminal-header>
                     <section class="content">
+                        ${
+                            this.history.map(entry => `
+                                <div>
+                                    <span>${entry.input}</span>
+                                    <br/>
+                                    <span>${entry.output}</span>
+                                </div>`).join('')
+                        }
                         <p>Type 'help' to see available commands.</p>
-                        <input type="text" class="command-input" placeholder="Enter command..." autofocus />
+                        <terminal-input></terminal-input>
                     </section>
                 </main>
             </section>
         `;
-    }
-
-    protected attachEventHandlers(): void {
-        this.commandHandler();
     }
 
     protected attachEventListeners(): void {
@@ -85,38 +78,30 @@ class TerminalWindow extends HTMLElement {
             // Implement close logic here
         });
 
-    }
-
-    private commandHandler(): void {
-        // Implement command handling logic here
-        const commandInput = this.shadowRoot?.querySelector('.command-input') as HTMLInputElement;
-        commandInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                const command = commandInput.value.trim();
-                if (command) {
-                    this.handleCommand(command);
-                }
-                commandInput.value = '';
-            }
+        // Listen for command events from the input
+        this.shadowRoot?.addEventListener('command', (event: Event) => {
+            const customEvent = event as CustomEvent<ParsedCommand>;
+            const command = customEvent.detail;
+            this.handleCommandListener(command);
         });
+
     }
 
-    private handleCommand(command: string): void {
+    private handleCommandListener(command: ParsedCommand): void {
         // Implement command parsing and execution logic here
-        const parsedCommand: ParsedCommand = this.parseCommand(command);
-        console.log('Parsed Command:', parsedCommand);
+        const { input, output } = this.parseTerminalEntry(command);
 
-        // Execute the command and update history
-        const output = `Executed command: ${parsedCommand.name}`;
-        this.history.push({ input: command, output });
-        console.log('Command history:', this.history);
+        this.history.push({ input, output });
         // Update the terminal display with the new output
+        this.render();
     }
 
-    private parseCommand(command: string): ParsedCommand {
-        const [name, ...args] = command.split(' ');
-        return { name, args };
+    private parseTerminalEntry(command: ParsedCommand): TerminalEntry {
+        // Implement command parsing logic here
+        const output = `Executed command: ${command.name}`; // Placeholder output
+        return { input: command.name, output };
     }
+
 }
 
 customElements.define('terminal-window', TerminalWindow);     
