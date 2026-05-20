@@ -29,26 +29,42 @@ class TerminalWindow extends HTMLElement {
         return `
             <style>
                 ${baseStyles}
-
-                .terminal-window {
+                section.terminal-window {
                     background-color: var(--terminal-bg);
                     color: var(--terminal-text);
     
                     font-family: var(--font-terminal);
     
                     width: 100%;
+                    height: 100vh;
                     min-height: 100vh;
     
                     overflow: auto;
     
                     padding: var(--space-md);
                 }
-    
+
                 main {
                     display: flex;
                     flex-direction: column;
+                
+                    height: 100%;
+                
                     gap: var(--space-md);
                 }
+
+                section.terminal-content {
+                    flex: 1;
+
+                    display: flex;
+                    flex-direction: column;
+                
+                    gap: var(--space-md);
+                
+                    overflow-y: auto;
+                }
+    
+
             </style>
         `;
     }
@@ -58,15 +74,17 @@ class TerminalWindow extends HTMLElement {
             <section class="terminal-window">
                 <main>
                     <terminal-header></terminal-header>
-                    ${
-                        this.history.map(entry => `
-                            <terminal-entry
-                                input='${entry.input}'
-                                output='${entry.output}'
-                            >
-                            </terminal-entry>
-                        `).join('')
-                    }
+                    <section class="terminal-content">
+                        ${
+                            this.history.map(entry => `
+                                <terminal-entry
+                                    input='${entry.input}'
+                                    output='${entry.output}'
+                                >
+                                </terminal-entry>
+                            `).join('')
+                        }
+                    </section>
                     <span>Type 'help' to see available commands.</span>
                     <terminal-input></terminal-input>
                 </main>
@@ -107,6 +125,8 @@ class TerminalWindow extends HTMLElement {
         this.addTerminalEntry(parsedCommand, output);
     
         this.render();
+
+        this.scrollToBottom();
     }
 
     private parseCommand(command: string): ParsedCommand {
@@ -135,6 +155,12 @@ class TerminalWindow extends HTMLElement {
         });
 
         console.log(this.history)
+    }
+
+    private scrollToBottom(): void {
+        const content = this.shadowRoot?.querySelector('.terminal-content') as HTMLElement | null;
+        if (!content) return;
+        content.scrollTop = content.scrollHeight;
     }
 
 }

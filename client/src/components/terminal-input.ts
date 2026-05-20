@@ -9,6 +9,7 @@ class TerminalInput extends HTMLElement {
     connectedCallback() {
         this.render();
         this.attachEventHandlers();
+        this.focusInput()
     }
 
     protected render(): void {
@@ -76,13 +77,18 @@ class TerminalInput extends HTMLElement {
                     this.dispatchCommand(command);
                 }
                 commandInput.value = '';
-                commandInput.focus();
             }
         });
     }
 
     private dispatchCommand(command: string): void {
         this.dispatchEvent(new CustomEvent('command', { detail: command, bubbles: true, composed: true }));
+    }
+
+    private focusInput(): void {
+        const input = this.shadowRoot?.querySelector('.command-input') as HTMLInputElement | null;
+
+        input?.focus();
     }
 
 }
