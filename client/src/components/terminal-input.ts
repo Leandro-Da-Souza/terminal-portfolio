@@ -21,16 +21,41 @@ class TerminalInput extends HTMLElement {
     protected styles(): string {
         return `
             <style>
+                :host {
+                    display: block;
+                }
+
+                *,
+                *::before,
+                *::after {
+                    box-sizing: border-box;
+                }
+
                 .command-input {
                     width: 100%;
+    
                     background-color: transparent;
                     border: none;
-                    color: #0f0;
-                    font-family: 'Courier New', Courier, monospace;
+    
+                    color: var(--terminal-text);
+    
+                    font-family: var(--font-terminal);
+                    font-size: 0.875rem;
+    
+                    caret-color: var(--terminal-text);
+    
+                    padding:
+                        var(--space-xs)
+                        0;
                 }
+    
                 .command-input:focus {
                     outline: none;
-                }   
+                }
+    
+                .command-input::placeholder {
+                    color: var(--terminal-text-muted);
+                }
             </style>
         `;
     }

@@ -22,36 +22,65 @@ class TerminalHeader extends HTMLElement {
     protected styles(): string {
         return `
             <style>
+                :host {
+                    display: block;
+                }
+                
+                *,
+                *::before,
+                *::after {
+                    box-sizing: border-box;
+                }
+
                 header {
-                    background-color: #333;
+                    background-color: var(--terminal-surface);
+    
                     display: flex;
                     justify-content: space-between;
+                    align-items: center;
+    
                     width: 100%;
+    
+                    padding:
+                        var(--space-xs)
+                        var(--space-sm);
+    
+                    font-family: var(--font-terminal);
                 }
+    
                 .title {
-                    width: 100%;
-                    margin: 0;
-                    padding: 0;
+                    color: var(--terminal-text-bright);
+    
+                    font-size: 1rem;
+                    font-weight: 700;
                 }
+    
                 .controls {
                     display: inline-flex;
-                    gap: 0.5em;
-                    justify-content: flex-end;
-                    width: 100%;
-                    margin: 0.1em 0.5em;
+                    gap: var(--space-xs);
                 }
+    
                 .controls span {
                     cursor: pointer;
-                    width: 1.5em;
-                    height: 1.5em;
+    
+                    width: 1.5rem;
+                    height: 1.5rem;
+    
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    background-color: #444;
-                    border-radius: 0.25em;
+    
+                    background-color: var(--terminal-bg);
+    
+                    border-radius: var(--radius-sm);
+    
+                    color: var(--terminal-text);
+    
+                    transition: background-color 120ms ease;
                 }
+    
                 .controls span:hover {
-                    background-color: #555;
+                    background-color: #3a3a3a;
                 }
             </style>
         `;

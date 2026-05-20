@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+:root {
+    --terminal-bg: #1e1e1e;
+    --terminal-surface: #2a2a2a;
+  
+    --terminal-text: #00ff66;
+    --terminal-text-bright: #ffffff;
+    --terminal-text-muted: #888888;
+  
+    --font-terminal:
+      'JetBrains Mono',
+      monospace;
+  
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+  
+    --radius-sm: 0.25rem;
+}

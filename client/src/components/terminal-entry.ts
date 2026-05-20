@@ -8,6 +8,14 @@ class TerminalEntry extends HTMLElement {
         this.render();
     }
 
+    public get input(): string {
+        return this.getAttribute('input') || "";
+    }
+
+    public get output(): string {
+        return this.getAttribute('output') || "";
+    }
+
     protected render(): void {
         if(!this.shadowRoot) return;
 
@@ -20,26 +28,66 @@ class TerminalEntry extends HTMLElement {
     protected styles(): string {
         return `
             <style>
+                :host {
+                    display: block;
+                }
+
+                *,
+                *::before,
+                *::after {
+                    box-sizing: border-box;
+}
+
+                .entry {
+                    display: flex;
+                    flex-direction: column;
+    
+                    gap: var(--space-xs);
+    
+                    font-size: 0.875rem;
+                    font-family: var(--font-terminal);
+                }
+    
+                .input-line {
+                    display: flex;
+                    align-items: center;
+    
+                    gap: var(--space-sm);
+    
+                    color: var(--terminal-text);
+                }
+    
+                .prompt {
+                    color: var(--terminal-text);
+                }
+    
+                .input {
+                    color: var(--terminal-text-bright);
+                }
+    
+                .output {
+                    color: var(--terminal-text);
+    
+                    white-space: pre-wrap;
+                    line-height: 1.5;
+                }
             </style>
         `;
     }
 
     protected markup(): string {
         return `
-            <section>
-                <span class="input">${this.sanitizeText(this.input)}</span>
-                <br/>
-                <span class="output">${this.sanitizeText(this.output)}</span>
+            <section class="entry">
+                <div class="input-line">
+                    <span class="prompt">></span>
+                    <span class="input">${this.sanitizeText(this.input)}</span>
+                </div>
+            
+                <div class="output">
+                    ${this.sanitizeText(this.output)}
+                </div>
             </section>
         `;
-    }
-
-    public get input(): string {
-        return this.getAttribute('input') || "";
-    }
-
-    public get output(): string {
-        return this.getAttribute('output') || "";
     }
 
     private sanitizeText(text: string): string {

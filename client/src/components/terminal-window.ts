@@ -27,13 +27,34 @@ class TerminalWindow extends HTMLElement {
     protected styles(): string {
         return `
             <style>
+                :host {
+                    display: block;
+                }
+
+                *,
+                *::before,
+                *::after {
+                    box-sizing: border-box;
+                }
+                    
                 .terminal-window {
-                    background-color: #222;
-                    color: #0f0;
-                    font-family: 'Courier New', Courier, monospace;
-                    min-width: 100dvw;
-                    min-height: 100dvh;
-                    overflow: hidden;
+                    background-color: var(--terminal-bg);
+                    color: var(--terminal-text);
+    
+                    font-family: var(--font-terminal);
+    
+                    width: 100%;
+                    min-height: 100vh;
+    
+                    overflow: auto;
+    
+                    padding: var(--space-md);
+                }
+    
+                main {
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--space-md);
                 }
             </style>
         `;
@@ -53,7 +74,7 @@ class TerminalWindow extends HTMLElement {
                             </terminal-entry>
                         `).join('')
                     }
-                    <p>Type 'help' to see available commands.</p>
+                    <span>Type 'help' to see available commands.</span>
                     <terminal-input></terminal-input>
                 </main>
             </section>

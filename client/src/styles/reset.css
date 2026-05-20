@@ -16,6 +16,13 @@
   }
 }
 
+html,
+body,
+#app {
+    width: 100%;
+    min-height: 100%;
+}
+
 body {
   /* 4. Increase line-height */
   line-height: 1.5;
