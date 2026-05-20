@@ -1,5 +1,5 @@
 import type { TerminalEntry } from '../types/terminal';
-import type { ParsedCommand } from '../types/command';
+import type { CommandResult, ParsedCommand } from '../types/command';
 import { CommandRegistry } from '../commands/registry';
 import { baseStyles } from '../styles/base';
 
@@ -8,14 +8,18 @@ class TerminalWindow extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
     }
+
+    private contentElement: HTMLElement | null = null;
+
+    private history: TerminalEntry[] = [];
     
     connectedCallback() {
         this.render();
         this.attachEventListeners();
+        this.contentElement =
+            this.shadowRoot!.querySelector('.terminal-content') as HTMLElement | null;
     }
     
-    private history: TerminalEntry[] = [];
-
     protected render(): void {
         if (!this.shadowRoot) return;
 
@@ -114,11 +118,22 @@ class TerminalWindow extends HTMLElement {
     }
 
     private commandHandler(command: string): void {
-        const parsedCommand = this.parseCommand(command);
+        const parsedCommand =
+            this.parseCommand(command);
     
-        const output = this.executeCommand(parsedCommand);
+        const result =
+            this.executeCommand(parsedCommand);
     
-        this.addTerminalEntry(parsedCommand, output);
+        if (result.type === 'output') {
+            this.addTerminalEntry(
+                parsedCommand,
+                result.output || ''
+            );
+        }
+    
+        if (result.type === 'effect') {
+            this.handleEffect(result.effect)
+        }
     
         this.scrollToBottom();
     }
@@ -128,9 +143,15 @@ class TerminalWindow extends HTMLElement {
         return { name, args };
     }
 
-    private executeCommand(parsedCommand: ParsedCommand): string {
-        const commandDef = CommandRegistry[parsedCommand.name] || CommandRegistry['default'];
-        return commandDef.execute(parsedCommand.args, CommandRegistry);
+    private executeCommand(parsedCommand: ParsedCommand): CommandResult {
+        const commandDef =
+        CommandRegistry[parsedCommand.name]
+        || CommandRegistry['default'];
+    
+        return commandDef.execute(
+            parsedCommand.args,
+            CommandRegistry
+        );
     }
 
     private addTerminalEntry(
@@ -152,13 +173,13 @@ class TerminalWindow extends HTMLElement {
     }
 
     private scrollToBottom(): void {
-        const content = this.shadowRoot?.querySelector('.terminal-content') as HTMLElement | null;
+        const content = this.contentElement;
         if (!content) return;
         content.scrollTop = content.scrollHeight;
     }
 
     private appendTerminalEntry(input: string, output: string) {
-        const content = this.shadowRoot?.querySelector('.terminal-content') as HTMLElement | null;
+        const content = this.contentElement;
         if(!content) return;
 
         const entry = document.createElement('terminal-entry');
@@ -167,6 +188,26 @@ class TerminalWindow extends HTMLElement {
         entry.setAttribute('output', output);
 
         content.appendChild(entry);
+    }
+
+    private handleEffect(effect: CommandResult['effect']): void {
+        if(!effect) return;
+
+        switch(effect) {
+            case 'clear':
+                this.history = []
+
+                const content = this.contentElement;
+        
+                if (content) {
+                    content.innerHTML = '';
+                }
+
+                break;
+            default:
+                console.log('No effect') 
+                break;
+        }
     }
 }
 

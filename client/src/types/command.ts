@@ -3,9 +3,15 @@ export type ParsedCommand = {
     args?: string[];
 }
 
+export type CommandResult = {
+    type: 'output' | 'effect'
+    output?: string,
+    effect?: string,
+}
+
 export type CommandDefinition = {
     description: string;
-    execute: (args?: string[], registry?: CommandRegistryType) => string;
+    execute: (args?: string[], registry?: CommandRegistryType) => CommandResult;
 }
 
 export type CommandRegistryType = {
