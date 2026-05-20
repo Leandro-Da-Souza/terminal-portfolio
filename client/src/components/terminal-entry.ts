@@ -111,7 +111,11 @@ class TerminalEntry extends HTMLElement {
                 } else {
                     outputContainer.textContent += ` ${word}`;
                 }
-    
+                
+                this.dispatchEvent(new CustomEvent('output-progress', {
+                    bubbles: true,
+                    composed: true
+                }));
             }, index * 200);
 
         });

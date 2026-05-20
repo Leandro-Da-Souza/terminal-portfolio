@@ -72,7 +72,7 @@ class TerminalInput extends HTMLElement {
 
         commandInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                const command = commandInput.value.trim();
+                const command = commandInput.value.trim().toLocaleLowerCase();
                 if (command) {
                     this.dispatchCommand(command);
                 }

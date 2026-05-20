@@ -4,8 +4,15 @@ import type { CommandRegistryType } from '../types/command';
 export const CommandRegistry: CommandRegistryType = {
     help: {
         description: 'List available commands',
-        execute: () => {
-            return 'Available commands: help, about, projects';
+        execute: (_, registry) => {
+            if(!registry) {
+                return 'Available commands: help, about, projects';
+            }
+            return Object.entries(registry)
+                .map(([name, command]) => {
+                    return `${name} - ${command.description}`
+                })
+                .join('\n');
         }
     },
     about: {

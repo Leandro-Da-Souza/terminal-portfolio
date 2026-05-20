@@ -106,6 +106,11 @@ class TerminalWindow extends HTMLElement {
             const command = customEvent.detail;
             this.commandHandler(command);
         });
+
+        // listen to custom output-progress event and scroll
+        this.shadowRoot?.addEventListener('output-progress', () => {
+            this.scrollToBottom()
+        })
     }
 
     private commandHandler(command: string): void {
@@ -125,7 +130,7 @@ class TerminalWindow extends HTMLElement {
 
     private executeCommand(parsedCommand: ParsedCommand): string {
         const commandDef = CommandRegistry[parsedCommand.name] || CommandRegistry['default'];
-        return commandDef.execute(parsedCommand.args);
+        return commandDef.execute(parsedCommand.args, CommandRegistry);
     }
 
     private addTerminalEntry(
@@ -163,7 +168,6 @@ class TerminalWindow extends HTMLElement {
 
         content.appendChild(entry);
     }
-
 }
 
 customElements.define('terminal-window', TerminalWindow);     

@@ -5,7 +5,7 @@ export type ParsedCommand = {
 
 export type CommandDefinition = {
     description: string;
-    execute: (args?: string[]) => string;
+    execute: (args?: string[], registry?: CommandRegistryType) => string;
 }
 
 export type CommandRegistryType = {
