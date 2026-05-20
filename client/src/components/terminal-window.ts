@@ -44,18 +44,17 @@ class TerminalWindow extends HTMLElement {
             <section class="terminal-window">
                 <main>
                     <terminal-header></terminal-header>
-                    <section class="content">
-                        ${
-                            this.history.map(entry => `
-                                <div>
-                                    <span>${entry.input}</span>
-                                    <br/>
-                                    <span>${entry.output}</span>
-                                </div>`).join('')
-                        }
-                        <p>Type 'help' to see available commands.</p>
-                        <terminal-input></terminal-input>
-                    </section>
+                    ${
+                        this.history.map(entry => `
+                            <terminal-entry
+                                input='${entry.input}'
+                                output='${entry.output}'
+                            >
+                            </terminal-entry>
+                        `).join('')
+                    }
+                    <p>Type 'help' to see available commands.</p>
+                    <terminal-input></terminal-input>
                 </main>
             </section>
         `;
@@ -120,6 +119,8 @@ class TerminalWindow extends HTMLElement {
             input,
             output
         });
+
+        console.log(this.history)
     }
 
 }
