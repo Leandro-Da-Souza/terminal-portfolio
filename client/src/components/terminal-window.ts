@@ -9,6 +9,8 @@ class TerminalWindow extends HTMLElement {
         this.attachShadow({ mode: 'open' });
     }
 
+    private fontSize: number = 14;
+
     private contentElement: HTMLElement | null = null;
 
     private history: TerminalEntry[] = [];
@@ -90,13 +92,20 @@ class TerminalWindow extends HTMLElement {
     protected attachEventListeners(): void {
         // Listen for minimize and close events from the header
         this.shadowRoot?.addEventListener('minimize', () => {
-            console.log('Minimize event received');
-            // Implement minimize logic here
+            this.fontSize -= 1;
+            document.documentElement.style.setProperty(
+                '--font-terminal-size',
+                `${this.fontSize}px`
+            );
         });
 
         this.shadowRoot?.addEventListener('maximize', () => {
             console.log('Maximize event received');
-            // Implement maximize logic here
+            this.fontSize += 1;
+            document.documentElement.style.setProperty(
+                '--font-terminal-size',
+                `${this.fontSize}px`
+            );
         });
 
         this.shadowRoot?.addEventListener('close', () => {

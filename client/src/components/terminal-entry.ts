@@ -38,9 +38,9 @@ class TerminalEntry extends HTMLElement {
                     flex-direction: column;
     
                     gap: var(--space-xs);
-    
-                    font-size: 0.875rem;
+
                     font-family: var(--font-terminal);
+                    font-size: var(--font-terminal-size);
                 }
     
                 .input-line {

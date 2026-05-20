@@ -11,6 +11,7 @@
     --font-terminal:
       'JetBrains Mono',
       monospace;
+    --font-terminal-size: 14px;;
   
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
