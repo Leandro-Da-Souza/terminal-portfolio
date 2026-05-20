@@ -75,15 +75,6 @@ class TerminalWindow extends HTMLElement {
                 <main>
                     <terminal-header></terminal-header>
                     <section class="terminal-content">
-                        ${
-                            this.history.map(entry => `
-                                <terminal-entry
-                                    input='${entry.input}'
-                                    output='${entry.output}'
-                                >
-                                </terminal-entry>
-                            `).join('')
-                        }
                     </section>
                     <span>Type 'help' to see available commands.</span>
                     <terminal-input></terminal-input>
@@ -124,8 +115,6 @@ class TerminalWindow extends HTMLElement {
     
         this.addTerminalEntry(parsedCommand, output);
     
-        this.render();
-
         this.scrollToBottom();
     }
 
@@ -154,13 +143,25 @@ class TerminalWindow extends HTMLElement {
             output
         });
 
-        console.log(this.history)
+        this.appendTerminalEntry(input, output);
     }
 
     private scrollToBottom(): void {
         const content = this.shadowRoot?.querySelector('.terminal-content') as HTMLElement | null;
         if (!content) return;
         content.scrollTop = content.scrollHeight;
+    }
+
+    private appendTerminalEntry(input: string, output: string) {
+        const content = this.shadowRoot?.querySelector('.terminal-content') as HTMLElement | null;
+        if(!content) return;
+
+        const entry = document.createElement('terminal-entry');
+
+        entry.setAttribute('input', input);
+        entry.setAttribute('output', output);
+
+        content.appendChild(entry);
     }
 
 }

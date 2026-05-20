@@ -8,6 +8,7 @@ class TerminalEntry extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        this.renderOutputAnimation(this.output)
     }
 
     public get input(): string {
@@ -78,7 +79,6 @@ class TerminalEntry extends HTMLElement {
                 </div>
             
                 <div class="output">
-                    ${this.sanitizeText(this.output)}
                 </div>
             </section>
         `;
@@ -91,6 +91,30 @@ class TerminalEntry extends HTMLElement {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
+    }
+
+    private renderOutputAnimation(output: string) {
+        const words = output.split(' ');
+    
+        const outputContainer =
+            this.shadowRoot?.querySelector('.output');
+    
+        if (!outputContainer) return;
+    
+        outputContainer.textContent = '';
+    
+        words.forEach((word, index) => {
+    
+            setTimeout(() => {
+                if(index === 0) {
+                    outputContainer.textContent += `${word}`;
+                } else {
+                    outputContainer.textContent += ` ${word}`;
+                }
+    
+            }, index * 200);
+
+        });
     }
 }
 
