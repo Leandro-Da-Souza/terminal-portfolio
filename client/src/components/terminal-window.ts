@@ -1,6 +1,7 @@
 import type { TerminalEntry } from '../types/terminal';
 import type { ParsedCommand } from '../types/command';
 import { CommandRegistry } from '../commands/registry';
+import { baseStyles } from '../styles/base';
 
 class TerminalWindow extends HTMLElement {
     constructor() {
@@ -27,16 +28,8 @@ class TerminalWindow extends HTMLElement {
     protected styles(): string {
         return `
             <style>
-                :host {
-                    display: block;
-                }
+                ${baseStyles}
 
-                *,
-                *::before,
-                *::after {
-                    box-sizing: border-box;
-                }
-                    
                 .terminal-window {
                     background-color: var(--terminal-bg);
                     color: var(--terminal-text);

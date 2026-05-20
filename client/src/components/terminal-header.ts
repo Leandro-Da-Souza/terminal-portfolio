@@ -1,3 +1,5 @@
+import { baseStyles } from "../styles/base";
+
 class TerminalHeader extends HTMLElement {
     constructor() {
         super()
@@ -22,16 +24,7 @@ class TerminalHeader extends HTMLElement {
     protected styles(): string {
         return `
             <style>
-                :host {
-                    display: block;
-                }
-                
-                *,
-                *::before,
-                *::after {
-                    box-sizing: border-box;
-                }
-
+                ${baseStyles}
                 header {
                     background-color: var(--terminal-surface);
     

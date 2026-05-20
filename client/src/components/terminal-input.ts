@@ -1,3 +1,5 @@
+import { baseStyles } from "../styles/base";
+
 class TerminalInput extends HTMLElement {
     constructor() {
         super();
@@ -21,15 +23,7 @@ class TerminalInput extends HTMLElement {
     protected styles(): string {
         return `
             <style>
-                :host {
-                    display: block;
-                }
-
-                *,
-                *::before,
-                *::after {
-                    box-sizing: border-box;
-                }
+                ${baseStyles}
 
                 .command-input {
                     width: 100%;

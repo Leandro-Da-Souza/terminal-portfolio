@@ -1,3 +1,5 @@
+import { baseStyles } from "../styles/base";
+
 class TerminalEntry extends HTMLElement {
     constructor() {
         super();
@@ -28,15 +30,7 @@ class TerminalEntry extends HTMLElement {
     protected styles(): string {
         return `
             <style>
-                :host {
-                    display: block;
-                }
-
-                *,
-                *::before,
-                *::after {
-                    box-sizing: border-box;
-}
+                ${baseStyles}
 
                 .entry {
                     display: flex;
