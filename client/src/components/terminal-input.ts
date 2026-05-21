@@ -12,6 +12,20 @@ class TerminalInput extends HTMLElement {
         this.focusInput()
     }
 
+    static get observedAttributes() {
+        return ['disabled'];
+    }
+    
+    attributeChangedCallback() {
+        this.render();
+        this.attachEventHandlers();
+        this.focusInput()
+    }
+
+    public get disabled(): boolean {
+        return this.hasAttribute('disabled');
+    }
+
     protected render(): void {
         if (!this.shadowRoot) return;
 
@@ -95,13 +109,26 @@ class TerminalInput extends HTMLElement {
                     color:
                         var(--terminal-text-bright);
                 }
+
+                .command-input:disabled {
+                    opacity: 0.25;
+                    cursor: not-allowed;
+                }
             </style>
         `;
     }
 
     protected markup(): string {
         return `
-            <input type="text" class="command-input" placeholder="Enter command..." autofocus />
+            <div class="command-wrapper">
+                <input 
+                    type="text" 
+                    class="command-input" 
+                    placeholder="Enter command..."
+                    ${this.disabled ? 'disabled' : ''} 
+                    autofocus 
+                />
+            </div>
         `;
     }
 

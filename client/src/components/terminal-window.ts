@@ -14,6 +14,8 @@ class TerminalWindow extends HTMLElement {
     private contentElement: HTMLElement | null = null;
 
     private history: TerminalEntry[] = [];
+
+    private isBooting: boolean = false;
     
     connectedCallback() {
         this.render();
@@ -143,8 +145,9 @@ class TerminalWindow extends HTMLElement {
                     margin-top: auto;
     
                     padding-top: var(--space-lg);
+                    margin-bottom: 0.5rem;
     
-                    font-size: 0.75rem;
+                    font-size: 0.80rem;
                 }
             </style>
         `;
@@ -158,7 +161,7 @@ class TerminalWindow extends HTMLElement {
                     <section class="terminal-content">
                     </section>
                     <span class="tooltip">Type 'help' to see available commands.</span>
-                    <terminal-input></terminal-input>
+                    <terminal-input disabled="${this.isBooting}"></terminal-input>
                 </main>
             </section>
         `;
@@ -303,8 +306,14 @@ class TerminalWindow extends HTMLElement {
     }
 
     private runBootSequence(): void {
+        this.isBooting = true;
+
+        const terminalInput = this.shadowRoot?.querySelector('terminal-input') as HTMLInputElement | null;
+
+        terminalInput?.setAttribute('disabled', 'true');
+
         Object.entries(BootRegistry)
-            .forEach(([key, command], index) => {
+            .forEach(([key, command], index, array) => {
                 setTimeout(() => {
     
                     const result = command.execute();
@@ -320,6 +329,15 @@ class TerminalWindow extends HTMLElement {
                             result.output,
                             result.variant
                         );
+    
+                    }
+
+                    // last boot item
+                    if (index === array.length - 1) {
+    
+                        this.isBooting = false;
+    
+                        terminalInput?.removeAttribute('disabled');
     
                     }
     
