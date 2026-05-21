@@ -158,6 +158,7 @@ class TerminalWindow extends HTMLElement {
             <section class="terminal-window">
                 <main>
                     <terminal-header></terminal-header>
+                    <terminal-banner></terminal-banner>
                     <section class="terminal-content">
                     </section>
                     <span class="tooltip">Type 'help' to see available commands.</span>
