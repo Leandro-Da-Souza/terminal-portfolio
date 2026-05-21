@@ -81,21 +81,24 @@ class TerminalWindow extends HTMLElement {
     
                 section.terminal-window::before {
                     content: '';
-    
+                
                     position: absolute;
                     inset: 0;
-    
+                
                     pointer-events: none;
-    
+                
                     background-image:
                         repeating-linear-gradient(
                             to bottom,
                             transparent 0px,
                             transparent 2px,
-                            rgba(255,255,255,0.03) 3px
+                            rgba(255,255,255,0.05) 5px
                         );
-    
+                
                     mix-blend-mode: soft-light;
+                
+                    animation:
+                        scanlines 8s linear infinite;
                 }
     
                 main {
@@ -148,6 +151,16 @@ class TerminalWindow extends HTMLElement {
                     margin-bottom: 0.5rem;
     
                     font-size: 0.80rem;
+                }
+
+                @keyframes scanlines {
+                    from {
+                        transform: translateY(0);
+                    }
+                
+                    to {
+                        transform: translateY(6px);
+                    }
                 }
             </style>
         `;
