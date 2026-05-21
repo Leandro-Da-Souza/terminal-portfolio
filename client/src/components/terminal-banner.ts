@@ -22,7 +22,7 @@ class TerminalBanner extends HTMLElement {
             <pre class="banner">
     [ DZS SYSTEMS ] STATUS: ONLINE
     
-    ██╗     ███████╗       ██████╗
+    ██╗     ███████╗     ██████╗
     ╚═ DZS/TERM v2.4.19-alpha ═╝
             </pre>
         `;
@@ -41,7 +41,7 @@ class TerminalBanner extends HTMLElement {
     
                     font-family: var(--font-terminal);
     
-                    font-size: 0.90rem;
+                    font-size: 0.70rem;
                     line-height: 1;
     
                     white-space: pre;

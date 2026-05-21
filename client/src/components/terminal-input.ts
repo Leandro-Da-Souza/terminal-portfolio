@@ -1,11 +1,14 @@
 import { baseStyles } from "../styles/base";
+import { CommandRegistry } from "../commands/registry";
 
 class TerminalInput extends HTMLElement {
     static get observedAttributes() {
         return ['disabled'];
     }
 
-    private commandHistory: string[] = []
+    private commands: string[] = [];
+
+    private commandHistory: string[] = [];
 
     private historyIndex: number = -1;
 
@@ -18,7 +21,9 @@ class TerminalInput extends HTMLElement {
         this.render();
         this.attachEventHandlers();
         this.focusInput()
+        this.commands = this.getCommands()
     }
+
     
     attributeChangedCallback() {
         this.render();
@@ -145,27 +150,56 @@ class TerminalInput extends HTMLElement {
         if (!commandInput) return;
 
         commandInput.addEventListener('keydown', (event) => {
-
             switch(event.key) {
                 case 'Enter':
+                    event.preventDefault();
                     const command = commandInput.value.trim().toLocaleLowerCase();
                     if (command) {
                         this.dispatchCommand(command);
-                        this.pushToCommandHistory(command)
+                        this.pushToCommandHistory(command);
                     }
                     commandInput.value = '';
                     break;
                 case 'ArrowUp':
-                    this.cycleHistory('up')
+                    event.preventDefault();
+                    this.cycleHistory('up');
                     break;
                 case 'ArrowDown':
-                    this.cycleHistory('down')
+                    event.preventDefault();
+                    this.cycleHistory('down');
+                    break;
+                case 'Tab':
+                    event.preventDefault();
+                    this.autoCompleteCommand();
                     break;
                 default:
                     break;
             }
 
         });
+    }
+
+    autoCompleteCommand() {
+        const input =
+            this.shadowRoot?.querySelector('.command-input') as HTMLInputElement | null;
+    
+        if (!input) return;
+    
+        if (this.commands.length === 0) return;
+    
+        const currentValue = input.value.trim();
+    
+        const match = this.commands.find(command =>
+            command.startsWith(currentValue)
+        );
+    
+        if (match) {
+            input.value = match;
+        }
+    }
+
+    private getCommands(): string[] {
+        return Object.keys(CommandRegistry);
     }
 
     private dispatchCommand(command: string): void {
