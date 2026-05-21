@@ -1,24 +1,23 @@
-import { baseStyles } from "../styles/base";
+import { baseStyles } from '../styles/base';
 
 class TerminalHeader extends HTMLElement {
     constructor() {
-        super()
-        this.attachShadow({ mode: 'open'})
+        super();
+        this.attachShadow({ mode: 'open' });
     }
 
     connectedCallback() {
-        this.render()
+        this.render();
         this.attachEventHandlers();
     }
 
     protected render(): void {
-        if(!this.shadowRoot) return;
+        if (!this.shadowRoot) return;
 
         this.shadowRoot.innerHTML = `
             ${this.styles()}
             ${this.markup()}
         `;
-
     }
 
     protected styles(): string {
@@ -134,7 +133,7 @@ class TerminalHeader extends HTMLElement {
                     <span class="close">x</span>
                 </section>
             </header>
-        `
+        `;
     }
 
     protected attachEventHandlers(): void {
@@ -165,4 +164,4 @@ class TerminalHeader extends HTMLElement {
     }
 }
 
-customElements.define('terminal-header', TerminalHeader)
+customElements.define('terminal-header', TerminalHeader);

@@ -1,4 +1,4 @@
-import { baseStyles } from "../styles/base";
+import { baseStyles } from '../styles/base';
 
 class TerminalEntry extends HTMLElement {
     constructor() {
@@ -8,31 +8,29 @@ class TerminalEntry extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        this.renderOutputAnimation(this.output)
+        this.renderOutputAnimation(this.output);
     }
 
     public get input(): string {
-        return this.getAttribute('input') || "";
+        return this.getAttribute('input') || '';
     }
 
     public get output(): string {
-        return this.getAttribute('output') || "";
+        return this.getAttribute('output') || '';
     }
 
     public get variant(): 'command' | 'system' {
-        return (
-            this.getAttribute('variant') as 'command' | 'system'
-        ) || 'command';
+        return (this.getAttribute('variant') as 'command' | 'system') || 'command';
     }
 
     protected render(): void {
-        if(!this.shadowRoot) return;
+        if (!this.shadowRoot) return;
 
         this.shadowRoot.innerHTML = `
             ${this.styles()}
             ${this.markup()}
-        `
-    } 
+        `;
+    }
 
     protected styles(): string {
         return `
@@ -143,12 +141,13 @@ class TerminalEntry extends HTMLElement {
         return `
             <section class="entry ${this.variant}">
                 <div class="input-line">
-                    ${this.variant === 'command' 
-                        ? `
+                    ${
+                        this.variant === 'command'
+                            ? `
                             <span class="prompt">></span>
                             <span class="input">${this.sanitizeText(this.input)}</span>
                         `
-                        : ''
+                            : ''
                     }
 
                 </div>
@@ -170,29 +169,28 @@ class TerminalEntry extends HTMLElement {
 
     private renderOutputAnimation(output: string) {
         const words = output.split(' ');
-    
-        const outputContainer =
-            this.shadowRoot?.querySelector('.output');
-    
+
+        const outputContainer = this.shadowRoot?.querySelector('.output');
+
         if (!outputContainer) return;
-    
+
         outputContainer.textContent = '';
-    
+
         words.forEach((word, index) => {
-    
             setTimeout(() => {
-                if(index === 0) {
+                if (index === 0) {
                     outputContainer.textContent += `${word}`;
                 } else {
                     outputContainer.textContent += ` ${word}`;
                 }
-                
-                this.dispatchEvent(new CustomEvent('output-progress', {
-                    bubbles: true,
-                    composed: true
-                }));
-            }, index * 200);
 
+                this.dispatchEvent(
+                    new CustomEvent('output-progress', {
+                        bubbles: true,
+                        composed: true,
+                    })
+                );
+            }, index * 200);
         });
     }
 }

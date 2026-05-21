@@ -1,5 +1,5 @@
-import { baseStyles } from "../styles/base";
-import { CommandRegistry } from "../commands/registry";
+import { baseStyles } from '../styles/base';
+import { CommandRegistry } from '../commands/registry';
 
 class TerminalInput extends HTMLElement {
     static get observedAttributes() {
@@ -20,15 +20,14 @@ class TerminalInput extends HTMLElement {
     connectedCallback() {
         this.render();
         this.attachEventHandlers();
-        this.focusInput()
-        this.commands = this.getCommands()
+        this.focusInput();
+        this.commands = this.getCommands();
     }
 
-    
     attributeChangedCallback() {
         this.render();
         this.attachEventHandlers();
-        this.focusInput()
+        this.focusInput();
     }
 
     public get disabled(): boolean {
@@ -145,11 +144,13 @@ class TerminalInput extends HTMLElement {
     }
 
     private commandHandler(): void {
-        const commandInput = this.shadowRoot?.querySelector('.command-input') as HTMLInputElement | null;
+        const commandInput = this.shadowRoot?.querySelector(
+            '.command-input'
+        ) as HTMLInputElement | null;
         if (!commandInput) return;
 
         commandInput.addEventListener('keydown', (event) => {
-            switch(event.key) {
+            switch (event.key) {
                 case 'Enter':
                     event.preventDefault();
                     const command = commandInput.value.trim().toLocaleLowerCase();
@@ -174,24 +175,20 @@ class TerminalInput extends HTMLElement {
                 default:
                     break;
             }
-
         });
     }
 
     autoCompleteCommand() {
-        const input =
-            this.shadowRoot?.querySelector('.command-input') as HTMLInputElement | null;
-    
+        const input = this.shadowRoot?.querySelector('.command-input') as HTMLInputElement | null;
+
         if (!input) return;
-    
+
         if (this.commands.length === 0) return;
-    
+
         const currentValue = input.value.trim();
-    
-        const match = this.commands.find(command =>
-            command.startsWith(currentValue)
-        );
-    
+
+        const match = this.commands.find((command) => command.startsWith(currentValue));
+
         if (match) {
             input.value = match;
         }
@@ -202,7 +199,9 @@ class TerminalInput extends HTMLElement {
     }
 
     private dispatchCommand(command: string): void {
-        this.dispatchEvent(new CustomEvent('command', { detail: command, bubbles: true, composed: true }));
+        this.dispatchEvent(
+            new CustomEvent('command', { detail: command, bubbles: true, composed: true })
+        );
     }
 
     private focusInput(): void {
@@ -211,55 +210,38 @@ class TerminalInput extends HTMLElement {
         input?.focus();
     }
 
-    private pushToCommandHistory(command:string) {
-        this.commandHistory.push(command)
+    private pushToCommandHistory(command: string) {
+        this.commandHistory.push(command);
         this.historyIndex = this.commandHistory.length;
     }
 
-    private cycleHistory(
-        direction: 'up' | 'down'
-    ) {
-
+    private cycleHistory(direction: 'up' | 'down') {
         if (this.commandHistory.length === 0) {
             return;
         }
-    
-        const input =
-            this.shadowRoot?.querySelector('.command-input') as HTMLInputElement | null;
-    
+
+        const input = this.shadowRoot?.querySelector('.command-input') as HTMLInputElement | null;
+
         if (!input) return;
-    
+
         if (direction === 'up') {
-    
             if (this.historyIndex > 0) {
                 this.historyIndex--;
             }
-    
         } else {
-    
-            if (
-                this.historyIndex
-                < this.commandHistory.length
-            ) {
+            if (this.historyIndex < this.commandHistory.length) {
                 this.historyIndex++;
             }
-    
         }
-    
-        if (
-            this.historyIndex
-            === this.commandHistory.length
-        ) {
-    
+
+        if (this.historyIndex === this.commandHistory.length) {
             input.value = '';
-    
+
             return;
         }
-    
-        input.value =
-            this.commandHistory[this.historyIndex] || '';
-    }
 
+        input.value = this.commandHistory[this.historyIndex] || '';
+    }
 }
 
 customElements.define('terminal-input', TerminalInput);

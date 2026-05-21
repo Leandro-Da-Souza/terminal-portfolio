@@ -1,15 +1,15 @@
 class TerminalBanner extends HTMLElement {
     constructor() {
-        super()
-        this.attachShadow({ mode: 'open' })
+        super();
+        this.attachShadow({ mode: 'open' });
     }
 
     connectedCallback() {
-        this.render()
+        this.render();
     }
 
     protected render() {
-        if(!this.shadowRoot) return;
+        if (!this.shadowRoot) return;
 
         this.shadowRoot.innerHTML = `
             ${this.styles()}

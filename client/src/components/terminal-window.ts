@@ -16,15 +16,16 @@ class TerminalWindow extends HTMLElement {
     private history: TerminalEntry[] = [];
 
     private isBooting: boolean = false;
-    
+
     connectedCallback() {
         this.render();
         this.attachEventListeners();
-        this.contentElement =
-            this.shadowRoot!.querySelector('.terminal-content') as HTMLElement | null;
-        this.runBootSequence()
+        this.contentElement = this.shadowRoot!.querySelector(
+            '.terminal-content'
+        ) as HTMLElement | null;
+        this.runBootSequence();
     }
-    
+
     protected render(): void {
         if (!this.shadowRoot) return;
 
@@ -214,28 +215,23 @@ class TerminalWindow extends HTMLElement {
 
         // listen to custom output-progress event and scroll
         this.shadowRoot?.addEventListener('output-progress', () => {
-            this.scrollToBottom()
-        })
+            this.scrollToBottom();
+        });
     }
 
     private commandHandler(command: string): void {
-        const parsedCommand =
-            this.parseCommand(command);
-    
-        const result =
-            this.executeCommand(parsedCommand);
-    
+        const parsedCommand = this.parseCommand(command);
+
+        const result = this.executeCommand(parsedCommand);
+
         if (result.type === 'output') {
-            this.addTerminalEntry(
-                parsedCommand,
-                result.output || ''
-            );
+            this.addTerminalEntry(parsedCommand, result.output || '');
         }
-    
+
         if (result.type === 'effect') {
-            this.handleEffect(result.effect)
+            this.handleEffect(result.effect);
         }
-    
+
         this.scrollToBottom();
     }
 
@@ -245,29 +241,17 @@ class TerminalWindow extends HTMLElement {
     }
 
     private executeCommand(parsedCommand: ParsedCommand): CommandResult {
-        const commandDef =
-        CommandRegistry[parsedCommand.name]
-        || CommandRegistry['default'];
-    
-        return commandDef.execute(
-            parsedCommand.args,
-            CommandRegistry
-        );
+        const commandDef = CommandRegistry[parsedCommand.name] || CommandRegistry['default'];
+
+        return commandDef.execute(parsedCommand.args, CommandRegistry);
     }
 
-    private addTerminalEntry(
-        parsedCommand: ParsedCommand,
-        output: string
-    ): void {
-    
-        const input = [
-            parsedCommand.name,
-            ...(parsedCommand.args || [])
-        ].join(' ');
-    
+    private addTerminalEntry(parsedCommand: ParsedCommand, output: string): void {
+        const input = [parsedCommand.name, ...(parsedCommand.args || [])].join(' ');
+
         this.history.push({
             input,
-            output
+            output,
         });
 
         this.appendTerminalEntry(input, output);
@@ -279,42 +263,38 @@ class TerminalWindow extends HTMLElement {
         content.scrollTop = content.scrollHeight;
     }
 
-    private appendTerminalEntry(
-        input: string, 
-        output: string, 
-        variant?: 'command' | 'system') 
-    {
+    private appendTerminalEntry(input: string, output: string, variant?: 'command' | 'system') {
         const content = this.contentElement;
-        if(!content) return;
+        if (!content) return;
 
         const entry = document.createElement('terminal-entry');
 
         entry.setAttribute('input', input);
         entry.setAttribute('output', output);
-        
-        if(variant) {
-            entry.setAttribute('variant', variant)
-        } 
+
+        if (variant) {
+            entry.setAttribute('variant', variant);
+        }
 
         content.appendChild(entry);
     }
 
     private handleEffect(effect: CommandResult['effect']): void {
-        if(!effect) return;
+        if (!effect) return;
 
-        switch(effect) {
+        switch (effect) {
             case 'clear':
-                this.history = []
+                this.history = [];
 
                 const content = this.contentElement;
-        
+
                 if (content) {
                     content.innerHTML = '';
                 }
 
                 break;
             default:
-                console.log('No effect') 
+                console.log('No effect');
                 break;
         }
     }
@@ -322,42 +302,30 @@ class TerminalWindow extends HTMLElement {
     private runBootSequence(): void {
         this.isBooting = true;
 
-        const terminalInput = this.shadowRoot?.querySelector('terminal-input') as HTMLInputElement | null;
+        const terminalInput = this.shadowRoot?.querySelector(
+            'terminal-input'
+        ) as HTMLInputElement | null;
 
         terminalInput?.setAttribute('disabled', 'true');
 
-        Object.entries(BootRegistry)
-            .forEach(([key, command], index, array) => {
-                setTimeout(() => {
-    
-                    const result = command.execute();
-                    console.log(result)
-    
-                    if (
-                        result.type === 'output'
-                        && result.output
-                    ) {
-    
-                        this.appendTerminalEntry(
-                            key,
-                            result.output,
-                            result.variant
-                        );
-    
-                    }
+        Object.entries(BootRegistry).forEach(([key, command], index, array) => {
+            setTimeout(() => {
+                const result = command.execute();
+                console.log(result);
 
-                    // last boot item
-                    if (index === array.length - 1) {
-    
-                        this.isBooting = false;
-    
-                        terminalInput?.removeAttribute('disabled');
-    
-                    }
-    
-                }, index * 1200);
-            });
+                if (result.type === 'output' && result.output) {
+                    this.appendTerminalEntry(key, result.output, result.variant);
+                }
+
+                // last boot item
+                if (index === array.length - 1) {
+                    this.isBooting = false;
+
+                    terminalInput?.removeAttribute('disabled');
+                }
+            }, index * 1200);
+        });
     }
 }
 
-customElements.define('terminal-window', TerminalWindow);     
+customElements.define('terminal-window', TerminalWindow);
