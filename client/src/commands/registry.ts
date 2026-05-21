@@ -59,3 +59,46 @@ export const CommandRegistry: CommandRegistryType = {
         }
     }
 }
+
+export const BootRegistry: CommandRegistryType = {
+    init: {
+        description: 'First sequence of the bootloader.',
+        execute: () => {
+            return { 
+                type: 'output',
+                output: 'INITIALIZING MACHINE SPIRIT...',
+                variant: 'system'
+            }
+        },
+    },
+    loading: {
+        description: 'Second sequence of the bootloader',
+        execute: () => {
+            return {
+                type: 'output',
+                output: 'LOADING NOOSPHERIC INDEX...',
+                variant: 'system'
+            }
+        }
+    },
+    verify: {
+        description: 'Third sequence of the bootloader.',
+        execute: () => {
+            return {
+                type: 'output',
+                output: 'VERIFYING PROTOCOLS...',
+                variant: 'system'
+            }
+        }
+    },
+    online: {
+        description: 'Final sequence of the bootloader',
+        execute: () => {
+            return {
+                type: 'output',
+                output: 'SYSTEM ONLINE.',
+                variant: 'system'
+            }
+        }
+    }
+}

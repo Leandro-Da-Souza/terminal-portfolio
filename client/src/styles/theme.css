@@ -1,21 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 :root {
-    --terminal-bg: #1e1e1e;
-    --terminal-surface: #2a2a2a;
-  
-    --terminal-text: #00ff66;
-    --terminal-text-bright: #ffffff;
-    --terminal-text-muted: #888888;
-  
+    --terminal-bg: #14110f;
+    --terminal-surface: #1d1814;
+
+    --terminal-panel: #26211b;
+    --terminal-border: #4a3b2b;
+
+    --terminal-text: #7ee787;
+    --terminal-text-bright: #f5f5f5;
+    --terminal-text-muted: #6e6a66;
+
+    --terminal-warning: #d65a31;
+    --terminal-accent: #c89b3c;
+
+    --terminal-glow: rgba(200, 155, 60, 0.12);
+    --terminal-shadow: rgba(0, 0, 0, 0.45);
+
     --font-terminal:
-      'JetBrains Mono',
-      monospace;
-    --font-terminal-size: 14px;;
-  
+        'JetBrains Mono',
+        monospace;
+
+    --font-terminal-size: 14px;
+
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
     --space-md: 1rem;
-  
+    --space-lg: 1.5rem;
+
     --radius-sm: 0.25rem;
 }

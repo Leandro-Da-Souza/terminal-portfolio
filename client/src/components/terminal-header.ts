@@ -25,9 +25,8 @@ class TerminalHeader extends HTMLElement {
         return `
             <style>
                 ${baseStyles}
-                header {
-                    background-color: var(--terminal-surface);
     
+                header {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -35,21 +34,58 @@ class TerminalHeader extends HTMLElement {
                     width: 100%;
     
                     padding:
-                        var(--space-xs)
-                        var(--space-sm);
+                        var(--space-sm)
+                        var(--space-md);
     
-                    font-family: var(--font-terminal);
+                    background:
+                        linear-gradient(
+                            to bottom,
+                            #2b241d,
+                            #211b16
+                        );
+    
+                    border:
+                        1px solid
+                        var(--terminal-border);
+    
+                    box-shadow:
+                        inset 0 -1px 0 rgba(255,255,255,0.03),
+                        0 0 10px var(--terminal-shadow);
+    
+                    position: relative;
+                }
+    
+                header::before {
+                    content: '';
+    
+                    position: absolute;
+    
+                    top: 0;
+                    left: 0;
+                    right: 0;
+    
+                    height: 1px;
+    
+                    background:
+                        rgba(200, 155, 60, 0.25);
                 }
     
                 .title {
-                    color: var(--terminal-text-bright);
+                    color: var(--terminal-accent);
     
-                    font-size: 1rem;
+                    font-size: 0.75rem;
                     font-weight: 700;
+    
+                    text-transform: uppercase;
+                    letter-spacing: 0.12em;
+    
+                    text-shadow:
+                        0 0 6px var(--terminal-glow);
                 }
     
                 .controls {
                     display: inline-flex;
+    
                     gap: var(--space-xs);
                 }
     
@@ -63,17 +99,26 @@ class TerminalHeader extends HTMLElement {
                     align-items: center;
                     justify-content: center;
     
-                    background-color: var(--terminal-bg);
+                    background-color: var(--terminal-surface);
     
-                    border-radius: var(--radius-sm);
+                    border:
+                        1px solid
+                        var(--terminal-border);
     
-                    color: var(--terminal-text);
+                    color: var(--terminal-text-muted);
     
-                    transition: background-color 120ms ease;
+                    transition:
+                        background-color 120ms ease,
+                        color 120ms ease,
+                        border-color 120ms ease;
                 }
     
                 .controls span:hover {
-                    background-color: #3a3a3a;
+                    background-color: var(--terminal-panel);
+    
+                    border-color: var(--terminal-accent);
+    
+                    color: var(--terminal-accent);
                 }
             </style>
         `;

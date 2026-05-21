@@ -25,8 +25,43 @@ class TerminalInput extends HTMLElement {
         return `
             <style>
                 ${baseStyles}
-
+    
+                .command-wrapper {
+                    display: flex;
+                    align-items: center;
+    
+                    gap: var(--space-sm);
+    
+                    padding:
+                        var(--space-sm)
+                        var(--space-md);
+    
+                    background-color: var(--terminal-surface);
+    
+                    border:
+                        1px solid
+                        var(--terminal-border);
+    
+                    box-shadow:
+                        inset 0 0 12px rgba(0,0,0,0.25);
+    
+                    position: relative;
+                }
+    
+                .command-wrapper::before {
+                    content: '>';
+    
+                    color: var(--terminal-accent);
+    
+                    font-weight: 700;
+    
+                    text-shadow:
+                        0 0 8px var(--terminal-glow);
+                }
+    
                 .command-input {
+                    flex: 1;
+    
                     width: 100%;
     
                     background-color: transparent;
@@ -35,13 +70,12 @@ class TerminalInput extends HTMLElement {
                     color: var(--terminal-text);
     
                     font-family: var(--font-terminal);
-                    font-size: 0.875rem;
+                    font-size: var(--font-terminal-size);
     
-                    caret-color: var(--terminal-text);
+                    caret-color: var(--terminal-accent);
     
-                    padding:
-                        var(--space-xs)
-                        0;
+                    text-shadow:
+                        0 0 4px rgba(126, 231, 135, 0.2);
                 }
     
                 .command-input:focus {
@@ -50,6 +84,16 @@ class TerminalInput extends HTMLElement {
     
                 .command-input::placeholder {
                     color: var(--terminal-text-muted);
+    
+                    opacity: 0.65;
+                }
+    
+                .command-input::selection {
+                    background-color:
+                        rgba(200, 155, 60, 0.35);
+    
+                    color:
+                        var(--terminal-text-bright);
                 }
             </style>
         `;

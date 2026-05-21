@@ -1,6 +1,6 @@
 import type { TerminalEntry } from '../types/terminal';
 import type { CommandResult, ParsedCommand } from '../types/command';
-import { CommandRegistry } from '../commands/registry';
+import { CommandRegistry, BootRegistry } from '../commands/registry';
 import { baseStyles } from '../styles/base';
 
 class TerminalWindow extends HTMLElement {
@@ -20,6 +20,7 @@ class TerminalWindow extends HTMLElement {
         this.attachEventListeners();
         this.contentElement =
             this.shadowRoot!.querySelector('.terminal-content') as HTMLElement | null;
+        this.runBootSequence()
     }
     
     protected render(): void {
@@ -35,42 +36,116 @@ class TerminalWindow extends HTMLElement {
         return `
             <style>
                 ${baseStyles}
+    
                 section.terminal-window {
-                    background-color: var(--terminal-bg);
+                    position: relative;
+    
+                    background:
+                        radial-gradient(
+                            circle at top,
+                            rgba(200, 155, 60, 0.05),
+                            transparent 40%
+                        ),
+    
+                        linear-gradient(
+                            to bottom,
+                            rgba(255,255,255,0.015),
+                            transparent 20%
+                        ),
+    
+                        linear-gradient(
+                            to right,
+                            rgba(200,155,60,0.02),
+                            transparent 35%
+                        ),
+    
+                        var(--terminal-bg);
+    
+                    box-shadow:
+                        inset 0 1px 0 rgba(255,255,255,0.03),
+                        inset 0 -1px 0 rgba(0,0,0,0.35);
+    
                     color: var(--terminal-text);
     
                     font-family: var(--font-terminal);
     
                     width: 100%;
                     height: 100vh;
-                    min-height: 100vh;
     
-                    overflow: auto;
+                    padding: var(--space-lg);
     
-                    padding: var(--space-md);
+                    overflow: hidden;
                 }
-
+    
+                section.terminal-window::before {
+                    content: '';
+    
+                    position: absolute;
+                    inset: 0;
+    
+                    pointer-events: none;
+    
+                    background-image:
+                        repeating-linear-gradient(
+                            to bottom,
+                            transparent 0px,
+                            transparent 2px,
+                            rgba(255,255,255,0.03) 3px
+                        );
+    
+                    mix-blend-mode: soft-light;
+                }
+    
                 main {
                     display: flex;
                     flex-direction: column;
-                
+    
                     height: 100%;
-                
-                    gap: var(--space-md);
-                }
-
-                section.terminal-content {
-                    flex: 1;
-
-                    display: flex;
-                    flex-direction: column;
-                
-                    gap: var(--space-md);
-                
-                    overflow-y: auto;
+    
+                    background-color: var(--terminal-panel);
+    
+                    border:
+                        1px solid
+                        var(--terminal-border);
+    
+                    box-shadow:
+                        0 0 20px var(--terminal-shadow),
+                        inset 0 0 24px rgba(0, 0, 0, 0.25);
+    
+                    padding: var(--space-md);
+    
+                    overflow: hidden;
                 }
     
-
+                section.terminal-content {
+                    flex: 1;
+    
+                    display: flex;
+                    flex-direction: column;
+    
+                    justify-content: flex-start;
+    
+                    overflow-y: auto;
+    
+                    padding-right: var(--space-xs);
+                    padding-bottom: var(--space-xl);
+                }
+    
+                section.terminal-content::-webkit-scrollbar {
+                    width: 8px;
+                }
+    
+                section.terminal-content::-webkit-scrollbar-thumb {
+                    background-color: var(--terminal-border);
+                }
+    
+                span.tooltip {
+                    margin-top: auto;
+    
+                    padding-top: var(--space-lg);
+    
+                    font-size: 0.75rem;
+                }
             </style>
         `;
     }
@@ -82,7 +157,7 @@ class TerminalWindow extends HTMLElement {
                     <terminal-header></terminal-header>
                     <section class="terminal-content">
                     </section>
-                    <span>Type 'help' to see available commands.</span>
+                    <span class="tooltip">Type 'help' to see available commands.</span>
                     <terminal-input></terminal-input>
                 </main>
             </section>
@@ -187,7 +262,11 @@ class TerminalWindow extends HTMLElement {
         content.scrollTop = content.scrollHeight;
     }
 
-    private appendTerminalEntry(input: string, output: string) {
+    private appendTerminalEntry(
+        input: string, 
+        output: string, 
+        variant?: 'command' | 'system') 
+    {
         const content = this.contentElement;
         if(!content) return;
 
@@ -195,6 +274,10 @@ class TerminalWindow extends HTMLElement {
 
         entry.setAttribute('input', input);
         entry.setAttribute('output', output);
+        
+        if(variant) {
+            entry.setAttribute('variant', variant)
+        } 
 
         content.appendChild(entry);
     }
@@ -217,6 +300,31 @@ class TerminalWindow extends HTMLElement {
                 console.log('No effect') 
                 break;
         }
+    }
+
+    private runBootSequence(): void {
+        Object.entries(BootRegistry)
+            .forEach(([key, command], index) => {
+                setTimeout(() => {
+    
+                    const result = command.execute();
+                    console.log(result)
+    
+                    if (
+                        result.type === 'output'
+                        && result.output
+                    ) {
+    
+                        this.appendTerminalEntry(
+                            key,
+                            result.output,
+                            result.variant
+                        );
+    
+                    }
+    
+                }, index * 1200);
+            });
     }
 }
 
