@@ -66,7 +66,7 @@ class TerminalInput extends HTMLElement {
                         var(--terminal-border);
     
                     box-shadow:
-                        inset 0 0 12px rgba(0,0,0,0.25);
+                        inset 0 0 12px var(--terminal-depth-shadow);
     
                     position: relative;
                 }
@@ -98,7 +98,7 @@ class TerminalInput extends HTMLElement {
                     caret-color: var(--terminal-accent);
     
                     text-shadow:
-                        0 0 4px rgba(126, 231, 135, 0.2);
+                        0 0 4px var(--terminal-glow);
                 }
     
                 .command-input:focus {
@@ -112,8 +112,7 @@ class TerminalInput extends HTMLElement {
                 }
     
                 .command-input::selection {
-                    background-color:
-                        rgba(200, 155, 60, 0.35);
+                    background-color: var(--terminal-selection);
     
                     color:
                         var(--terminal-text-bright);

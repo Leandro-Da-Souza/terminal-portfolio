@@ -45,19 +45,19 @@ class TerminalWindow extends HTMLElement {
                     background:
                         radial-gradient(
                             circle at top,
-                            rgba(200, 155, 60, 0.05),
+                            var(--terminal-overlay-strong),
                             transparent 40%
                         ),
     
                         linear-gradient(
                             to bottom,
-                            rgba(255,255,255,0.015),
+                            var(--terminal-overlay-soft),
                             transparent 20%
                         ),
     
                         linear-gradient(
                             to right,
-                            rgba(200,155,60,0.02),
+                            var(--terminal-scanline),
                             transparent 35%
                         ),
     

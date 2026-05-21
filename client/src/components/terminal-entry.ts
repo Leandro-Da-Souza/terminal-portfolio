@@ -52,7 +52,7 @@ class TerminalEntry extends HTMLElement {
                     background:
                         linear-gradient(
                             to right,
-                            rgba(200, 155, 60, 0.03),
+                            var(--terminal-overlay),
                             transparent 30%
                         );
     
@@ -64,7 +64,7 @@ class TerminalEntry extends HTMLElement {
                     font-size: var(--font-terminal-size);
     
                     box-shadow:
-                        inset 0 0 0 1px rgba(255,255,255,0.015);
+                        inset 0 0 0 1px var(--terminal-highlight);
                 }
     
                 .entry.command {
@@ -133,7 +133,7 @@ class TerminalEntry extends HTMLElement {
                     line-height: 1.7;
     
                     text-shadow:
-                        0 0 8px rgba(126, 231, 135, 0.08);
+                        0 0 8px var(--terminal-glow);
                 }
             </style>
         `;

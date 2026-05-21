@@ -1,8 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
-:root {
+:root[data-theme="rust"] {
     --terminal-bg: #14110f;
     --terminal-surface: #1d1814;
+
+    --terminal-header-top: #2b241d;
+    --terminal-header-bottom: #211b16;
+    --terminal-header-line:
+        rgba(200, 155, 60, 0.25);
 
     --terminal-panel: #26211b;
     --terminal-border: #4a3b2b;
@@ -16,6 +21,104 @@
 
     --terminal-glow: rgba(200, 155, 60, 0.12);
     --terminal-shadow: rgba(0, 0, 0, 0.45);
+    --terminal-depth-shadow: rgba(0, 0, 0, 0.25);
+    --terminal-highlight: rgba(255, 220, 180, 0.015);
+    --terminal-selection: rgba(200, 155, 60, 0.35);
+
+    --terminal-overlay-strong:rgba(200, 155, 60, 0.05);
+    --terminal-overlay-soft:rgba(200,155,60,0.02);
+    --terminal-scanline: rgba(255,255,255,0.05);
+
+    --font-terminal:
+        'JetBrains Mono',
+        monospace;
+
+    --font-terminal-size: 14px;
+
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+
+    --radius-sm: 0.25rem;
+}
+
+:root[data-theme="matrix"] {
+    --terminal-bg: #050805;
+    --terminal-surface: #0b120b;
+
+    --terminal-header-top: #0f160f;
+    --terminal-header-bottom: #0a110a;
+    --terminal-header-line:
+        rgba(50, 217, 123, 0.22);
+
+    --terminal-panel: #101710;
+    --terminal-border: #1f3a1f;
+
+    --terminal-text: #7CFFB2;
+    --terminal-text-bright: #d8ffe7;
+    --terminal-text-muted: #4d6a57;
+
+    --terminal-warning: #7CFFB2;
+    --terminal-accent: #32d97b;
+
+    --terminal-glow: rgba(50, 217, 123, 0.16);
+    --terminal-shadow: rgba(0, 0, 0, 0.6);
+    --terminal-depth-shadow: rgba(0, 0, 0, 0.25);
+    --terminal-highlight:
+    rgba(120, 255, 180, 0.015);
+    --terminal-selection:rgba(50, 217, 123, 0.30);
+
+    --terminal-overlay-strong:rgba(50, 217, 123, 0.05);
+    --terminal-overlay-soft:rgba(50, 217, 123, 0.02);
+    --terminal-scanline:rgba(120,255,180,0.04);
+
+    --font-terminal:
+        'JetBrains Mono',
+        monospace;
+
+    --font-terminal-size: 14px;
+
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+
+    --radius-sm: 0.25rem;
+}
+
+:root[data-theme="frost"] {
+    --terminal-bg: #0b1116;
+    --terminal-surface: #121a21;
+
+    --terminal-header-top: #18232d;
+    --terminal-header-bottom: #111a22;
+    --terminal-header-line:
+        rgba(91, 188, 255, 0.22);
+
+    --terminal-panel: #18222b;
+    --terminal-border: #28404f;
+
+    --terminal-text: #8cd6ff;
+    --terminal-text-bright: #e8f7ff;
+    --terminal-text-muted: #6b8798;
+
+    --terminal-warning: #ff7b72;
+    --terminal-accent: #5bbcff;
+
+    --terminal-glow: rgba(91, 188, 255, 0.14);
+    --terminal-shadow: rgba(0, 0, 0, 0.5);
+    --terminal-depth-shadow: rgba(0, 0, 0, 0.25);
+    --terminal-highlight:
+    rgba(220, 240, 255, 0.018);
+    --terminal-selection:rgba(91, 188, 255, 0.30);
+
+    --terminal-overlay-strong:
+    rgba(91, 188, 255, 0.05);
+    --terminal-overlay-soft:
+        rgba(91, 188, 255, 0.02);
+    --terminal-scanline:
+        rgba(220,240,255,0.04);
 
     --font-terminal:
         'JetBrains Mono',

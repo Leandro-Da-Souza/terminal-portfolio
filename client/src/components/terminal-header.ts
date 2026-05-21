@@ -40,8 +40,8 @@ class TerminalHeader extends HTMLElement {
                     background:
                         linear-gradient(
                             to bottom,
-                            #2b241d,
-                            #211b16
+                            var(--terminal-header-top),
+                            var(--terminal-header-bottom)
                         );
     
                     border:
@@ -49,7 +49,7 @@ class TerminalHeader extends HTMLElement {
                         var(--terminal-border);
     
                     box-shadow:
-                        inset 0 -1px 0 rgba(255,255,255,0.03),
+                        inset 0 -1px 0 var(--terminal-highlight),
                         0 0 10px var(--terminal-shadow);
     
                     position: relative;
@@ -67,7 +67,7 @@ class TerminalHeader extends HTMLElement {
                     height: 1px;
     
                     background:
-                        rgba(200, 155, 60, 0.25);
+                        var(--terminal-header-line);
                 }
     
                 .title {
