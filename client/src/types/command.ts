@@ -7,6 +7,7 @@ export type CommandResult = {
     type: 'output' | 'effect';
     output?: string;
     effect?: string;
+    parameter?: any;
     variant?: 'command' | 'system';
 };
 

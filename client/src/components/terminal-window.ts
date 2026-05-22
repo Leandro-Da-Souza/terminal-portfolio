@@ -229,7 +229,7 @@ class TerminalWindow extends HTMLElement {
         }
 
         if (result.type === 'effect') {
-            this.handleEffect(result.effect);
+            this.handleEffect(result.effect, result.parameter);
         }
 
         this.scrollToBottom();
@@ -279,7 +279,10 @@ class TerminalWindow extends HTMLElement {
         content.appendChild(entry);
     }
 
-    private handleEffect(effect: CommandResult['effect']): void {
+    private handleEffect(
+        effect: CommandResult['effect'], 
+        parameter?: CommandResult['parameter'])
+    : void {
         if (!effect) return;
 
         switch (effect) {
@@ -291,6 +294,17 @@ class TerminalWindow extends HTMLElement {
                 if (content) {
                     content.innerHTML = '';
                 }
+
+                break;
+            case 'theme-change':
+                if(!parameter) return;
+
+                document.documentElement.setAttribute(
+                    'data-theme',
+                    parameter
+                );
+
+                localStorage.setItem('theme', parameter);
 
                 break;
             default:

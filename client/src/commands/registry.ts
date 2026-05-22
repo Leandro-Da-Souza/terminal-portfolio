@@ -3,7 +3,6 @@ import type { CommandRegistryType } from '../types/command';
 export const CommandRegistry: CommandRegistryType = {
     help: {
         description: 'List available commands',
-
         execute: (_, registry) => {
             if (!registry) {
                 return {
@@ -17,6 +16,7 @@ export const CommandRegistry: CommandRegistryType = {
 
                 output: Object.entries(registry)
                     .map(([name, command]) => {
+                        if(name === 'default') return;
                         return `${name} - ${command.description}`;
                     })
                     .join('\n'),
@@ -48,6 +48,47 @@ export const CommandRegistry: CommandRegistryType = {
             // This will be handled specially in the terminal component to clear the display
         },
     },
+    theme: {
+        description: 'Set current theme for the terminal',
+    
+        execute: (args) => {
+    
+            const themes: string[] = [
+                'rust',
+                'matrix',
+                'frost'
+            ];
+    
+            if (!args || args.length === 0) {
+    
+                return {
+                    type: 'output',
+                    output:
+                        'Please set a valid theme:\n' +
+                        '- theme rust\n' +
+                        '- theme matrix\n' +
+                        '- theme frost'
+                };
+            }
+    
+            const selectedTheme = args[0];
+    
+            if (!themes.includes(selectedTheme)) {
+                return {
+                    type: 'output',
+                    output:
+                        `"${selectedTheme}" is not a valid theme`
+                };
+            }
+    
+            return {
+                type: 'effect',
+                effect: 'theme-change',
+                output: `Theme changed to ${selectedTheme}`,
+                parameter: selectedTheme,
+            };
+        }
+    },
     default: {
         description: 'Default response for unknown commands',
         execute: () => {
@@ -57,6 +98,7 @@ export const CommandRegistry: CommandRegistryType = {
             };
         },
     },
+
 };
 
 export const BootRegistry: CommandRegistryType = {
