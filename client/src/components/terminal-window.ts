@@ -9,7 +9,7 @@ class TerminalWindow extends HTMLElement {
         this.attachShadow({ mode: 'open' });
     }
 
-    private fontSize: number = 14;
+    private fontSize: number = 13;
 
     private contentElement: HTMLElement | null = null;
 
