@@ -8,12 +8,15 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "server": "tsx watch server.ts"
     },
     "dependencies": {
+        "cors": "^2.8.6",
         "express": "^5.2.1"
     },
     "devDependencies": {
+        "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
         "@types/node": "^25.8.0",
         "prettier": "^3.8.3",

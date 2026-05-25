@@ -1,5 +1,5 @@
 import { baseStyles } from '../styles/base';
-import { CommandRegistry } from '../commands/registry';
+import { CommandMetaData } from '../../../shared/metadata/command-metadata';
 
 class TerminalInput extends HTMLElement {
     static get observedAttributes() {
@@ -195,7 +195,7 @@ class TerminalInput extends HTMLElement {
     }
 
     private getCommands(): string[] {
-        return Object.keys(CommandRegistry);
+        return Object.keys(CommandMetaData);
     }
 
     private dispatchCommand(command: string): void {

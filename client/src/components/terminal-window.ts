@@ -1,6 +1,11 @@
-import type { TerminalEntry } from '../types/terminal';
-import type { CommandResult, ParsedCommand } from '../types/command';
-import { CommandRegistry, BootRegistry } from '../commands/registry';
+import type { TerminalEntry } from '../../../shared/types/terminal';
+import type {
+    CommandResult,
+    CommandVariant,
+    ParsedCommand,
+} from '../../../shared/types/command';
+import { CommandMetaData } from '../../../shared/metadata/command-metadata';
+import { BootRegistry, ClientCommandRegistry } from '../commands/client-registry';
 import { baseStyles } from '../styles/base';
 
 class TerminalWindow extends HTMLElement {
@@ -360,42 +365,76 @@ class TerminalWindow extends HTMLElement {
         );
     }
 
-    private commandHandler(command: string): void {
+    private async commandHandler(command: string): Promise<void> {
         const parsedCommand = this.parseCommand(command);
 
-        const result = this.executeCommand(parsedCommand);
-
-        if (result.type === 'output') {
-            this.addTerminalEntry(parsedCommand, result.output || '');
+        if (
+            this.isServerCommand(parsedCommand.name)
+        ) {
+            await this.sendCommandToServer(parsedCommand);
+        
+            return;
         }
+        
+        const result =
+            this.executeCommand(parsedCommand);
 
-        if (result.type === 'effect') {
-            this.handleEffect(result.effect, result.parameter);
-        }
+        this.handleCommandResult(parsedCommand, result);
 
         this.scrollToBottom();
     }
 
     private parseCommand(command: string): ParsedCommand {
-        const [name, ...args] = command.split(' ');
+        const [name = '', ...args] = command.trim().split(/\s+/);
+
         return { name, args };
     }
 
-    private executeCommand(parsedCommand: ParsedCommand): CommandResult {
-        const commandDef = CommandRegistry[parsedCommand.name] || CommandRegistry['default'];
-
-        return commandDef.execute(parsedCommand.args, CommandRegistry);
+    private executeCommand(
+        parsedCommand: ParsedCommand
+    ): CommandResult {
+    
+        const commandDef =
+            ClientCommandRegistry[
+                parsedCommand.name
+            ] || ClientCommandRegistry['default'];
+    
+        return commandDef.execute(
+            parsedCommand.args,
+            CommandMetaData
+        );
     }
 
-    private addTerminalEntry(parsedCommand: ParsedCommand, output: string): void {
-        const input = [parsedCommand.name, ...(parsedCommand.args || [])].join(' ');
+    private handleCommandResult(
+        parsedCommand: ParsedCommand,
+        result: CommandResult
+    ): void {
+        if (result.output) {
+            this.addTerminalEntry(
+                parsedCommand,
+                result.output,
+                result.variant
+            );
+        }
+
+        if (result.type === 'effect') {
+            this.handleEffect(result.effect, result.parameter);
+        }
+    }
+
+    private addTerminalEntry(
+        parsedCommand: ParsedCommand,
+        output: string,
+        variant?: CommandVariant
+    ): void {
+        const input = [parsedCommand.name, ...parsedCommand.args].join(' ');
 
         this.history.push({
             input,
             output,
         });
 
-        this.appendTerminalEntry(input, output);
+        this.appendTerminalEntry(input, output, variant);
     }
 
     private scrollToBottom(): void {
@@ -404,7 +443,11 @@ class TerminalWindow extends HTMLElement {
         content.scrollTop = content.scrollHeight;
     }
 
-    private appendTerminalEntry(input: string, output: string, variant?: 'command' | 'system') {
+    private appendTerminalEntry(
+        input: string,
+        output: string,
+        variant?: CommandVariant
+    ): void {
         const content = this.contentElement;
         if (!content) return;
 
@@ -450,10 +493,56 @@ class TerminalWindow extends HTMLElement {
                 break;
             case 'shutdown':
                 this.shutdownTerminal()
-                break
-            default:
-                console.log('No effect');
                 break;
+            default:
+                console.log('No effect found for: ', effect);
+                break;
+        }
+    }
+
+    private isServerCommand(
+        commandName: string
+    ): boolean {
+    
+        const command =
+            CommandMetaData[commandName];
+    
+        return command?.scope === 'server';
+    }
+
+    private async sendCommandToServer(
+        parsedCommand: ParsedCommand
+    ): Promise<void> {
+        try {
+            const response = await fetch(
+                'http://localhost:3001/terminal/command',
+                {
+                    method: 'POST',
+        
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+        
+                    body: JSON.stringify({
+                        command: [
+                            parsedCommand.name,
+                            ...parsedCommand.args
+                        ].join(' ')
+                    })
+                }
+            );
+
+            const result = await response.json() as CommandResult;
+
+            this.handleCommandResult(parsedCommand, result);
+        } catch {
+            this.addTerminalEntry(
+                parsedCommand,
+                'Unable to reach terminal server.',
+                'system'
+            );
+        } finally {
+            this.scrollToBottom();
         }
     }
 
