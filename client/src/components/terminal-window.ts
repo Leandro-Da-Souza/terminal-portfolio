@@ -93,13 +93,13 @@ class TerminalWindow extends HTMLElement {
                             to bottom,
                             transparent 0px,
                             transparent 2px,
-                            rgba(255,255,255,0.05) 5px
+                            rgba(255,255,255,0.14) 3.5px
                         );
                 
                     mix-blend-mode: soft-light;
                 
                     animation:
-                        scanlines 8s linear infinite;
+                        scanlines 14s linear infinite;
                 }
     
                 main {
@@ -154,15 +154,7 @@ class TerminalWindow extends HTMLElement {
                     font-size: 0.80rem;
                 }
 
-                @keyframes scanlines {
-                    from {
-                        transform: translateY(0);
-                    }
-                
-                    to {
-                        transform: translateY(6px);
-                    }
-                }
+                ${this.keyFrameAnimations()}
             </style>
         `;
     }
@@ -340,6 +332,20 @@ class TerminalWindow extends HTMLElement {
             }, index * 1200);
         });
     }
+
+    private keyFrameAnimations(): string {
+        return `
+            @keyframes scanlines {
+                from {
+                    transform: translateY(0);
+                }
+            
+                to {
+                    transform: translateY(14px);
+                }
+            }
+        `
+    } 
 }
 
 customElements.define('terminal-window', TerminalWindow);
