@@ -4,9 +4,8 @@ export const ServerCommandRegistry: CommandRegistryType = {
     about: {
         execute: () => {
             return {
-                type: 'output',    
-                output:
-`Leandro Da Souza
+                type: 'output',
+                output: `Leandro Da Souza
 Software developer based in Stockholm, Sweden.
 
 Interested in interactive UI systems,
@@ -18,7 +17,7 @@ Use:
 - experience
 - contact
 
-to learn more.`.trim()
+to learn more.`.trim(),
             };
         },
     },
@@ -26,9 +25,8 @@ to learn more.`.trim()
         execute() {
             return {
                 type: 'output',
-    
-                output:
-`Frontend
+
+                output: `Frontend
 ─────────
 TypeScript
 JavaScript
@@ -62,18 +60,17 @@ Also explored
 React Native
 Angular
 Nuxt
-Next`.trim()
+Next`.trim(),
             };
-        }
+        },
     },
 
     experience: {
         execute() {
             return {
                 type: 'output',
-    
-                output:
-`4+ years building high-traffic web applications
+
+                output: `4+ years building high-traffic web applications
 within the iGaming industry and large-scale
 multi-brand platform environments.
 
@@ -96,26 +93,25 @@ and infrastructure-adjacent work including:
 
 Comfortable collaborating across product,
 design, QA, and backend teams while shipping
-production-grade features at scale.`.trim()
+production-grade features at scale.`.trim(),
             };
-        }
+        },
     },
     contact: {
         execute() {
             return {
                 type: 'output',
-    
-                output:
-`GitHub
+
+                output: `GitHub
 https://github.com/Leandro-Da-Souza
 
 LinkedIn
 https://linkedin.com/in/leandro-da-souza
 
 Email
-dasouza.leandro@gmail.com`.trim()
+dasouza.leandro@gmail.com`.trim(),
             };
-        }
+        },
     },
     projects: {
         execute: () => {
@@ -125,5 +121,4 @@ dasouza.leandro@gmail.com`.trim()
             };
         },
     },
-
-}
+};

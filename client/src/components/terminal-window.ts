@@ -1,9 +1,5 @@
 import type { TerminalEntry } from '../../../shared/types/terminal';
-import type {
-    CommandResult,
-    CommandVariant,
-    ParsedCommand,
-} from '../../../shared/types/command';
+import type { CommandResult, CommandVariant, ParsedCommand } from '../../../shared/types/command';
 import { CommandMetaData } from '../../../shared/metadata/command-metadata';
 import { BootRegistry, ClientCommandRegistry } from '../commands/client-registry';
 import { baseStyles } from '../styles/base';
@@ -22,7 +18,7 @@ class TerminalWindow extends HTMLElement {
 
     private terminalInput: HTMLElement | null = null;
 
-    private rebootButton: HTMLElement | null = null; 
+    private rebootButton: HTMLElement | null = null;
 
     private history: TerminalEntry[] = [];
 
@@ -39,29 +35,19 @@ class TerminalWindow extends HTMLElement {
         this.terminalElement = this.shadowRoot!.querySelector(
             'section.terminal-window'
         ) as HTMLElement | null;
-        this.terminalInput = this.shadowRoot!.querySelector(
-            'terminal-input'
-        ) as HTMLElement | null
-        this.rebootButton = this.shadowRoot!.querySelector(
-            '.reboot-button'
-        ) as HTMLElement | null;
+        this.terminalInput = this.shadowRoot!.querySelector('terminal-input') as HTMLElement | null;
+        this.rebootButton = this.shadowRoot!.querySelector('.reboot-button') as HTMLElement | null;
 
         this.attachEventListeners();
         this.runBootSequence();
-        this.animationStart()
-        this.animationEnd()
+        this.animationStart();
+        this.animationEnd();
     }
 
     disconnectedCallback(): void {
-        window.removeEventListener(
-            'keydown',
-            this.handleKeydown
-        );
-    
-        this.terminalElement?.removeEventListener(
-            'animationend',
-            this.handleAnimationEnd
-        );
+        window.removeEventListener('keydown', this.handleKeydown);
+
+        this.terminalElement?.removeEventListener('animationend', this.handleAnimationEnd);
     }
 
     protected render(): void {
@@ -359,25 +345,19 @@ class TerminalWindow extends HTMLElement {
             this.scrollToBottom();
         });
 
-        this.rebootButton?.addEventListener(
-            'click',
-            () => this.rebootTerminal()
-        );
+        this.rebootButton?.addEventListener('click', () => this.rebootTerminal());
     }
 
     private async commandHandler(command: string): Promise<void> {
         const parsedCommand = this.parseCommand(command);
 
-        if (
-            this.isServerCommand(parsedCommand.name)
-        ) {
+        if (this.isServerCommand(parsedCommand.name)) {
             await this.sendCommandToServer(parsedCommand);
-        
+
             return;
         }
-        
-        const result =
-            this.executeCommand(parsedCommand);
+
+        const result = this.executeCommand(parsedCommand);
 
         this.handleCommandResult(parsedCommand, result);
 
@@ -390,31 +370,16 @@ class TerminalWindow extends HTMLElement {
         return { name, args };
     }
 
-    private executeCommand(
-        parsedCommand: ParsedCommand
-    ): CommandResult {
-    
+    private executeCommand(parsedCommand: ParsedCommand): CommandResult {
         const commandDef =
-            ClientCommandRegistry[
-                parsedCommand.name
-            ] || ClientCommandRegistry['default'];
-    
-        return commandDef.execute(
-            parsedCommand.args,
-            CommandMetaData
-        );
+            ClientCommandRegistry[parsedCommand.name] || ClientCommandRegistry['default'];
+
+        return commandDef.execute(parsedCommand.args, CommandMetaData);
     }
 
-    private handleCommandResult(
-        parsedCommand: ParsedCommand,
-        result: CommandResult
-    ): void {
+    private handleCommandResult(parsedCommand: ParsedCommand, result: CommandResult): void {
         if (result.output) {
-            this.addTerminalEntry(
-                parsedCommand,
-                result.output,
-                result.variant
-            );
+            this.addTerminalEntry(parsedCommand, result.output, result.variant);
         }
 
         if (result.type === 'effect') {
@@ -443,11 +408,7 @@ class TerminalWindow extends HTMLElement {
         content.scrollTop = content.scrollHeight;
     }
 
-    private appendTerminalEntry(
-        input: string,
-        output: string,
-        variant?: CommandVariant
-    ): void {
+    private appendTerminalEntry(input: string, output: string, variant?: CommandVariant): void {
         const content = this.contentElement;
         if (!content) return;
 
@@ -464,9 +425,9 @@ class TerminalWindow extends HTMLElement {
     }
 
     private handleEffect(
-        effect: CommandResult['effect'], 
-        parameter?: CommandResult['parameter'])
-    : void {
+        effect: CommandResult['effect'],
+        parameter?: CommandResult['parameter']
+    ): void {
         if (!effect) return;
 
         switch (effect) {
@@ -481,18 +442,15 @@ class TerminalWindow extends HTMLElement {
 
                 break;
             case 'theme-change':
-                if(!parameter) return;
+                if (!parameter) return;
 
-                document.documentElement.setAttribute(
-                    'data-theme',
-                    parameter
-                );
+                document.documentElement.setAttribute('data-theme', parameter);
 
                 localStorage.setItem('theme', parameter);
 
                 break;
             case 'shutdown':
-                this.shutdownTerminal()
+                this.shutdownTerminal();
                 break;
             default:
                 console.log('No effect found for: ', effect);
@@ -500,47 +458,31 @@ class TerminalWindow extends HTMLElement {
         }
     }
 
-    private isServerCommand(
-        commandName: string
-    ): boolean {
-    
-        const command =
-            CommandMetaData[commandName];
-    
+    private isServerCommand(commandName: string): boolean {
+        const command = CommandMetaData[commandName];
+
         return command?.scope === 'server';
     }
 
-    private async sendCommandToServer(
-        parsedCommand: ParsedCommand
-    ): Promise<void> {
+    private async sendCommandToServer(parsedCommand: ParsedCommand): Promise<void> {
         try {
-            const response = await fetch(
-                'http://localhost:3001/terminal/command',
-                {
-                    method: 'POST',
-        
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-        
-                    body: JSON.stringify({
-                        command: [
-                            parsedCommand.name,
-                            ...parsedCommand.args
-                        ].join(' ')
-                    })
-                }
-            );
+            const response = await fetch('http://localhost:3001/terminal/command', {
+                method: 'POST',
 
-            const result = await response.json() as CommandResult;
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+
+                body: JSON.stringify({
+                    command: [parsedCommand.name, ...parsedCommand.args].join(' '),
+                }),
+            });
+
+            const result = (await response.json()) as CommandResult;
 
             this.handleCommandResult(parsedCommand, result);
         } catch {
-            this.addTerminalEntry(
-                parsedCommand,
-                'Unable to reach terminal server.',
-                'system'
-            );
+            this.addTerminalEntry(parsedCommand, 'Unable to reach terminal server.', 'system');
         } finally {
             this.scrollToBottom();
         }
@@ -656,49 +598,30 @@ class TerminalWindow extends HTMLElement {
                     opacity: 1;
                 }
             }
-        `
+        `;
     }
-    
-    private handleAnimationEnd = (): void => {
 
-        if (
-            this.terminalElement?.classList.contains('closing')
-        ) {
-    
-            this.terminalElement.classList.remove(
-                'closing'
-            );
-    
-            this.terminalElement.classList.add(
-                'closed'
-            );
-    
+    private handleAnimationEnd = (): void => {
+        if (this.terminalElement?.classList.contains('closing')) {
+            this.terminalElement.classList.remove('closing');
+
+            this.terminalElement.classList.add('closed');
+
             this.isOpen = false;
         }
-    
-        if (
-            this.terminalElement?.classList.contains('opening')
-        ) {
-    
-            this.terminalElement.classList.remove(
-                'opening'
-            );
+
+        if (this.terminalElement?.classList.contains('opening')) {
+            this.terminalElement.classList.remove('opening');
         }
     };
 
     private rebootTerminal(): void {
-
         if (this.isOpen) return;
-    
-        this.terminalElement?.classList.remove(
-            'closed',
-            'closing'
-        );
-    
-        this.terminalElement?.classList.add(
-            'opening'
-        );
-    
+
+        this.terminalElement?.classList.remove('closed', 'closing');
+
+        this.terminalElement?.classList.add('opening');
+
         this.isOpen = true;
     }
 
@@ -707,31 +630,19 @@ class TerminalWindow extends HTMLElement {
     };
 
     private animationStart(): void {
-        window.addEventListener(
-            'keydown',
-            this.handleKeydown
-        );
+        window.addEventListener('keydown', this.handleKeydown);
     }
 
     private animationEnd(): void {
-        this.terminalElement?.addEventListener(
-            'animationend',
-            this.handleAnimationEnd
-        );
+        this.terminalElement?.addEventListener('animationend', this.handleAnimationEnd);
     }
 
     private shutdownTerminal(): void {
-
         if (!this.isOpen) return;
-    
-        this.terminalElement?.classList.remove(
-            'opening',
-            'closed'
-        );
-    
-        this.terminalElement?.classList.add(
-            'closing'
-        );
+
+        this.terminalElement?.classList.remove('opening', 'closed');
+
+        this.terminalElement?.classList.add('closing');
     }
 }
 

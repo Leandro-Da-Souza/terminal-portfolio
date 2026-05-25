@@ -15,7 +15,7 @@ export const ClientCommandRegistry: CommandRegistryType = {
 
                 output: Object.entries(metadata)
                     .map(([name, command]) => {
-                        if(name === 'default') return;
+                        if (name === 'default') return;
                         return `${name} - ${command.description}`;
                     })
                     .join('\n'),
@@ -27,51 +27,45 @@ export const ClientCommandRegistry: CommandRegistryType = {
             return { type: 'effect', effect: 'clear' };
         },
     },
-    theme: {    
+    theme: {
         execute: (args) => {
-            const themes: string[] = [
-                'rust',
-                'matrix',
-                'frost'
-            ];
-    
+            const themes: string[] = ['rust', 'matrix', 'frost'];
+
             if (!args || args.length === 0) {
-    
                 return {
                     type: 'output',
                     output:
                         'Please set a valid theme:\n' +
                         '- theme rust\n' +
                         '- theme matrix\n' +
-                        '- theme frost'
+                        '- theme frost',
                 };
             }
-    
+
             const selectedTheme = args[0];
-    
+
             if (!themes.includes(selectedTheme)) {
                 return {
                     type: 'output',
-                    output:
-                        `"${selectedTheme}" is not a valid theme`
+                    output: `"${selectedTheme}" is not a valid theme`,
                 };
             }
-    
+
             return {
                 type: 'effect',
                 effect: 'theme-change',
                 output: `Theme changed to ${selectedTheme}`,
                 parameter: selectedTheme,
             };
-        }
+        },
     },
     exit: {
         execute: () => {
             return {
                 type: 'effect',
-                effect: 'shutdown'
-            }
-        }
+                effect: 'shutdown',
+            };
+        },
     },
     default: {
         execute: () => {
