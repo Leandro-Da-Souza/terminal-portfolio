@@ -204,7 +204,7 @@ dasouza.leandro@gmail.com`.trim()
         }
     },
     exit: {
-        description: 'Shutdown the terminal.',
+        description: 'Shutdown the terminal',
         execute: () => {
             return {
                 type: 'effect',
