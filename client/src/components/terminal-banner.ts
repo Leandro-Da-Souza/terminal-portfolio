@@ -41,7 +41,7 @@ class TerminalBanner extends HTMLElement {
     
                     font-family: var(--font-terminal);
     
-                    font-size: 0.70rem;
+                    font-size: 0.60rem;
                     line-height: 1;
     
                     white-space: pre;
