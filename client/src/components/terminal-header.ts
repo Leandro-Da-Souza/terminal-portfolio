@@ -70,6 +70,9 @@ class TerminalHeader extends HTMLElement {
                 }
     
                 .title {
+                    display: flex;
+                    align-items: baseline;
+                    gap: 0.5rem;
                     color: var(--terminal-accent);
     
                     font-size: 0.75rem;
@@ -80,6 +83,16 @@ class TerminalHeader extends HTMLElement {
     
                     text-shadow:
                         0 0 6px var(--terminal-glow);
+                }
+
+                .title span {
+                    color: var(--terminal-text-muted);
+                
+                    font-size: 0.58rem;
+                
+                    letter-spacing: 0.12em;
+                
+                    opacity: 0.55;
                 }
     
                 .controls {
@@ -126,7 +139,10 @@ class TerminalHeader extends HTMLElement {
     protected markup(): string {
         return `
             <header>
-                <h3 class="title">Terminal Portfolio</h3>
+                <h3 class="title">
+                    DZS://RELAY
+                    <span>TERMINAL NODE</span>
+                </h3>
                 <section class="controls">
                     <span class="maximize">+</span>
                     <span class="minimize">_</span>
