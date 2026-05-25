@@ -203,6 +203,15 @@ dasouza.leandro@gmail.com`.trim()
             };
         }
     },
+    exit: {
+        description: 'Shutdown the terminal.',
+        execute: () => {
+            return {
+                type: 'effect',
+                effect: 'shutdown'
+            }
+        }
+    },
     default: {
         description: 'Default response for unknown commands',
         execute: () => {

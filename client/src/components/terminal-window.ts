@@ -150,9 +150,11 @@ class TerminalWindow extends HTMLElement {
                         linear-gradient(
                             to bottom,
                             transparent 0%,
-                            rgba(255,255,255,0.95) 48%,
+                            transparent 47%,
+                            rgba(255,255,255,0.95) 49%,
                             rgba(255,255,255,1) 50%,
-                            rgba(255,255,255,0.95) 52%,
+                            rgba(255,255,255,0.95) 51%,
+                            transparent 53%,
                             transparent 100%
                         );
 
@@ -222,11 +224,8 @@ class TerminalWindow extends HTMLElement {
                 }
 
                 .terminal-window.closing::after {
-                    opacity: 1;
-                    transition:
-                        opacity 120ms ease;
                     animation:
-                        crtFlash 120ms ease-out;
+                        crtFlash 180ms ease-out;
                 }
 
                 .terminal-window.closed main {
@@ -340,12 +339,7 @@ class TerminalWindow extends HTMLElement {
         });
 
         this.shadowRoot?.addEventListener('close', () => {
-            this.terminalElement?.classList.remove(
-                'opening',
-                'closed'
-            );
-            
-            this.terminalElement?.classList.add('closing');
+            this.shutdownTerminal();
         });
 
         // Listen for command events from the input
@@ -454,6 +448,9 @@ class TerminalWindow extends HTMLElement {
                 localStorage.setItem('theme', parameter);
 
                 break;
+            case 'shutdown':
+                this.shutdownTerminal()
+                break
             default:
                 console.log('No effect');
                 break;
@@ -544,14 +541,15 @@ class TerminalWindow extends HTMLElement {
             }
 
             @keyframes crtFlash {
+
                 0% {
                     opacity: 0;
                     transform: scaleY(1);
                 }
             
-                40% {
-                    opacity: 1;
-                    transform: scaleY(1.8);
+                25% {
+                    opacity: 0.85;
+                    transform: scaleY(1.4);
                 }
             
                 100% {
@@ -559,7 +557,6 @@ class TerminalWindow extends HTMLElement {
                     transform: scaleY(0.02);
                 }
             }
-                
             @keyframes rebootPulse {
 
                 0%, 100% {
@@ -579,9 +576,13 @@ class TerminalWindow extends HTMLElement {
             this.terminalElement?.classList.contains('closing')
         ) {
     
-            this.terminalElement.classList.remove('closing');
+            this.terminalElement.classList.remove(
+                'closing'
+            );
     
-            this.terminalElement.classList.add('closed');
+            this.terminalElement.classList.add(
+                'closed'
+            );
     
             this.isOpen = false;
         }
@@ -590,7 +591,9 @@ class TerminalWindow extends HTMLElement {
             this.terminalElement?.classList.contains('opening')
         ) {
     
-            this.terminalElement.classList.remove('opening');
+            this.terminalElement.classList.remove(
+                'opening'
+            );
         }
     };
 
@@ -628,6 +631,19 @@ class TerminalWindow extends HTMLElement {
         );
     }
 
+    private shutdownTerminal(): void {
+
+        if (!this.isOpen) return;
+    
+        this.terminalElement?.classList.remove(
+            'opening',
+            'closed'
+        );
+    
+        this.terminalElement?.classList.add(
+            'closing'
+        );
+    }
 }
 
 customElements.define('terminal-window', TerminalWindow);
