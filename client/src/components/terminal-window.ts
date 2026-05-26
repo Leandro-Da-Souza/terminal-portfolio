@@ -1,7 +1,8 @@
 import type { TerminalEntry } from '../../../shared/types/terminal';
 import type { CommandResult, CommandVariant, ParsedCommand } from '../../../shared/types/command';
 import { CommandMetaData } from '../../../shared/metadata/command-metadata';
-import { BootRegistry, ClientCommandRegistry } from '../commands/client-registry';
+import { ClientCommandRegistry } from '../commands/client-registry';
+import { BootSequence, ServerErrorMessage } from '../commands/system-registry';
 import { baseStyles } from '../styles/base';
 
 class TerminalWindow extends HTMLElement {
@@ -23,6 +24,8 @@ class TerminalWindow extends HTMLElement {
     private history: TerminalEntry[] = [];
 
     private isBooting: boolean = false;
+
+    private isLoading: boolean = false;
 
     private isOpen: boolean = true;
 
@@ -482,34 +485,32 @@ class TerminalWindow extends HTMLElement {
 
             return (await response.json()) as CommandResult;
         } catch {
-            return {
-                type: 'output',
-                output: 'Unable to reach terminal server.',
-                variant: 'system'
-            } satisfies CommandResult;
+            return ServerErrorMessage;
         } 
     }
 
     private runBootSequence(): void {
+
         this.isBooting = true;
-
-        this.terminalInput?.setAttribute('disabled', 'true');
-
-        Object.entries(BootRegistry).forEach(([key, command], index, array) => {
+    
+        this.terminalInput?.setAttribute(
+            'disabled',
+            'true'
+        );
+    
+        BootSequence.forEach( (message, index, array) => {
             setTimeout(() => {
-                const result = command.execute();
-                console.log(result);
 
-                if (result.type === 'output' && result.output) {
-                    this.appendTerminalEntry(key, result.output, result.variant);
-                }
+                this.addSystemMessage(message);
 
-                // last boot item
                 if (index === array.length - 1) {
                     this.isBooting = false;
 
-                    this.terminalInput?.removeAttribute('disabled');
+                    this.terminalInput?.removeAttribute(
+                        'disabled'
+                    );
                 }
+
             }, index * 1200);
         });
     }
@@ -637,6 +638,21 @@ class TerminalWindow extends HTMLElement {
 
     private animationEnd(): void {
         this.terminalElement?.addEventListener('animationend', this.handleAnimationEnd);
+    }
+
+    private addSystemMessage(
+        message: string
+    ): void {
+        if(message.trim() === '') return;
+
+        this.addTerminalEntry(
+            {
+                name: '',
+                args: []
+            },
+            message,
+            'system'
+        )
     }
 
     private shutdownTerminal(): void {
