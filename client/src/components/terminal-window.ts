@@ -4,25 +4,30 @@ import { CommandMetaData } from '../../../shared/metadata/command-metadata';
 import { ClientCommandRegistry } from '../commands/client-registry';
 import { BootSequence, SystemMessages, ServerErrorMessage } from '../commands/system-registry';
 import { TerminalInput } from './terminal-input';
-import baseText from '../styles/modules/base.css?inline';
-import cssText from '../styles/modules/terminal-window.css?inline';
+import baseText from '../styles/components/base.css?inline';
+import cssText from '../styles/components/terminal-window.css?inline';
 
 const terminalWindowStyleSheet = new CSSStyleSheet();
-terminalWindowStyleSheet.replaceSync(cssText)
+terminalWindowStyleSheet.replaceSync(cssText);
 
 const baseStyleSheet = new CSSStyleSheet();
-baseStyleSheet.replaceSync(baseText)
+baseStyleSheet.replaceSync(baseText);
 
 class TerminalWindow extends HTMLElement {
-    
     constructor() {
         super();
-        this.attachShadow({ 
-            mode: "open" 
-        }).adoptedStyleSheets = [ 
-            baseStyleSheet , 
-            terminalWindowStyleSheet 
-        ]
+        this.attachShadow({
+            mode: 'open'
+        }).adoptedStyleSheets = [
+            baseStyleSheet,
+            terminalWindowStyleSheet
+        ];
+    }
+
+    static define(tag = 'terminal-window'): void {
+        if (!customElements.get(tag)) {
+            customElements.define(tag, this);
+        }
     }
 
     private fontSize: number = 13;
@@ -390,4 +395,4 @@ class TerminalWindow extends HTMLElement {
     }
 }
 
-customElements.define('terminal-window', TerminalWindow);
+TerminalWindow.define();

@@ -1,7 +1,30 @@
-import { baseStyles } from '../styles/base';
 import { CommandMetaData } from '../../../shared/metadata/command-metadata';
+import baseText from '../styles/components/base.css?inline';
+import cssText from '../styles/components/terminal-input.css?inline';
+
+const terminalInputStyleSheet = new CSSStyleSheet();
+terminalInputStyleSheet.replaceSync(cssText);
+
+const baseStyleSheet = new CSSStyleSheet();
+baseStyleSheet.replaceSync(baseText);
 
 export class TerminalInput extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({
+            mode: 'open'
+        }).adoptedStyleSheets = [
+            baseStyleSheet,
+            terminalInputStyleSheet
+        ];
+    }
+
+    static define(tag = 'terminal-input'): void {
+        if (!customElements.get(tag)) {
+            customElements.define(tag, this);
+        }
+    }
+
     static get observedAttributes() {
         return ['disabled'];
     }
@@ -11,11 +34,6 @@ export class TerminalInput extends HTMLElement {
     private commandHistory: string[] = [];
 
     private historyIndex: number = -1;
-
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-    }
 
     connectedCallback() {
         this.render();
@@ -46,90 +64,7 @@ export class TerminalInput extends HTMLElement {
         if (!this.shadowRoot) return;
 
         this.shadowRoot.innerHTML = `
-            ${this.styles()}
             ${this.markup()}
-        `;
-    }
-
-    protected styles(): string {
-        return `
-            <style>
-                ${baseStyles}
-    
-                .command-wrapper {
-                    display: flex;
-                    align-items: center;
-    
-                    gap: var(--space-sm);
-    
-                    padding:
-                        var(--space-sm)
-                        var(--space-md);
-    
-                    background-color: var(--terminal-surface);
-    
-                    border:
-                        1px solid
-                        var(--terminal-border);
-    
-                    box-shadow:
-                        inset 0 0 12px var(--terminal-depth-shadow);
-    
-                    position: relative;
-                }
-    
-                .command-wrapper::before {
-                    content: '>';
-    
-                    color: var(--terminal-accent);
-    
-                    font-weight: 700;
-    
-                    text-shadow:
-                        0 0 8px var(--terminal-glow);
-                }
-    
-                .command-input {
-                    flex: 1;
-    
-                    width: 100%;
-    
-                    background-color: transparent;
-                    border: none;
-    
-                    color: var(--terminal-text);
-    
-                    font-family: var(--font-terminal);
-                    font-size: var(--font-terminal-size);
-    
-                    caret-color: var(--terminal-accent);
-    
-                    text-shadow:
-                        0 0 4px var(--terminal-glow);
-                }
-    
-                .command-input:focus {
-                    outline: none;
-                }
-    
-                .command-input::placeholder {
-                    color: var(--terminal-text-muted);
-    
-                    opacity: 0.65;
-                }
-    
-                .command-input::selection {
-                    background-color: var(--terminal-selection);
-    
-                    color:
-                        var(--terminal-text-bright);
-                }
-
-                .command-input:disabled {
-                    opacity: 0.25;
-                    cursor: not-allowed;
-                }
-            </style>
         `;
     }
 
@@ -252,4 +187,4 @@ export class TerminalInput extends HTMLElement {
     }
 }
 
-customElements.define('terminal-input', TerminalInput);
+TerminalInput.define();
