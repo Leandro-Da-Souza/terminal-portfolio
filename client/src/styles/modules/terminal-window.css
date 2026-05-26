@@ -1,0 +1,301 @@
+section.terminal-window {
+    position: relative;
+
+    background:
+        radial-gradient(
+            circle at top,
+            var(--terminal-overlay-strong),
+            transparent 40%
+        ),
+
+        linear-gradient(
+            to bottom,
+            var(--terminal-overlay-soft),
+            transparent 20%
+        ),
+
+        linear-gradient(
+            to right,
+            var(--terminal-scanline),
+            transparent 35%
+        ),
+
+        var(--terminal-bg);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.03),
+        inset 0 -1px 0 rgba(0,0,0,0.35);
+
+    color: var(--terminal-text);
+
+    font-family: var(--font-terminal);
+
+    width: 100%;
+    height: 100vh;
+
+    padding: var(--space-lg);
+
+    overflow: hidden;
+
+    transform-origin: center center;
+    will-change: transform, opacity, filter;
+    
+}
+
+section.terminal-window::before {
+    content: '';
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background-image:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 2px,
+            rgba(255,255,255,0.08) 3.5px
+        );
+
+    mix-blend-mode: soft-light;
+
+    animation:
+        scanlines 14s linear infinite;
+}
+
+section.terminal-window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            to bottom,
+            transparent 0%,
+            transparent 47%,
+            rgba(255,255,255,0.95) 49%,
+            rgba(255,255,255,1) 50%,
+            rgba(255,255,255,0.95) 51%,
+            transparent 53%,
+            transparent 100%
+        );
+
+    opacity: 0;
+
+    mix-blend-mode: screen;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+
+    background-color: var(--terminal-panel);
+
+    border:
+        1px solid
+        var(--terminal-border);
+
+    box-shadow:
+        0 0 20px var(--terminal-shadow),
+        inset 0 0 24px rgba(0, 0, 0, 0.25);
+
+    padding: var(--space-md);
+
+    overflow: hidden;
+
+    transition:
+        opacity 120ms ease;
+}
+
+section.terminal-content {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: flex-start;
+
+    overflow-y: auto;
+
+    padding-right: var(--space-xs);
+    padding-bottom: var(--space-xl);
+}
+
+section.terminal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+section.terminal-content::-webkit-scrollbar-thumb {
+    background-color: var(--terminal-border);
+}
+
+span.tooltip {
+    margin-top: auto;
+
+    padding-top: var(--space-lg);
+    margin-bottom: 0.5rem;
+
+    font-size: 0.80rem;
+}
+
+.terminal-window.closing {
+    animation:
+        crtShutdown 0.45s ease-out;
+}
+
+.terminal-window.closing::after {
+    animation:
+        crtFlash 180ms ease-out;
+}
+
+.terminal-window.closed main {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.terminal-window.opening {
+    animation:
+        crtBootup 0.45s ease-out;
+}
+
+section.terminal-overlay {
+    position: absolute;
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,0.92);
+
+    z-index: 20;
+    opacity: 0;
+
+    transition:
+        opacity 180ms ease;
+
+    pointer-events: none;
+    
+}
+
+.terminal-window.closed .terminal-overlay {
+    display: flex;
+    opacity: 1;
+    pointer-events: all;
+}
+
+.reboot-button {
+    background: transparent;
+
+    border:
+        1px solid var(--terminal-border);
+
+    color: var(--terminal-accent);
+
+    padding:
+        var(--space-md)
+        var(--space-lg);
+
+    font-family: var(--font-terminal);
+
+    cursor: pointer;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.08em;
+
+    animation:
+        rebootPulse 2s ease-in-out infinite;
+}
+
+@keyframes scanlines {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(14px);
+    }
+}
+
+@keyframes crtShutdown {
+    0% {
+        opacity: 1;
+        transform: scaleY(1);
+        filter: brightness(1);
+    }
+
+    70% {
+        transform: scaleY(0.02);
+        filter:
+            brightness(8)
+            blur(1px);
+    }
+
+    100% {
+        transform: scaleY(0);
+        opacity: 0;
+    }
+}
+
+@keyframes crtBootup {
+    0% {
+        opacity: 0;
+        transform: scaleY(0);
+        filter: brightness(3);
+    }
+
+    20% {
+        opacity: 1;
+        transform: scaleY(0.02);
+        filter:
+            brightness(8)
+            blur(1px);
+    }
+
+    60% {
+        transform: scaleY(1.05);
+        filter: brightness(1.5);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scaleY(1);
+        filter: brightness(1);
+    }
+}
+
+@keyframes crtFlash {
+
+    0% {
+        opacity: 0;
+        transform: scaleY(1);
+    }
+
+    25% {
+        opacity: 0.85;
+        transform: scaleY(1.4);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scaleY(0.02);
+    }
+}
+@keyframes rebootPulse {
+
+    0%, 100% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
