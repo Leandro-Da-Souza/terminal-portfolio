@@ -5,20 +5,15 @@ header {
 
     width: 100%;
 
-    padding:
-        var(--space-sm)
-        var(--space-md);
+    padding: var(--space-sm) var(--space-md);
 
-    background:
-        linear-gradient(
-            to bottom,
-            var(--terminal-header-top),
-            var(--terminal-header-bottom)
-        );
+    background: linear-gradient(
+        to bottom,
+        var(--terminal-header-top),
+        var(--terminal-header-bottom)
+    );
 
-    border:
-        1px solid
-        var(--terminal-border);
+    border: 1px solid var(--terminal-border);
 
     box-shadow:
         inset 0 -1px 0 var(--terminal-highlight),
@@ -38,8 +33,7 @@ header::before {
 
     height: 1px;
 
-    background:
-        var(--terminal-header-line);
+    background: var(--terminal-header-line);
 }
 
 .title {
@@ -54,8 +48,7 @@ header::before {
     text-transform: uppercase;
     letter-spacing: 0.12em;
 
-    text-shadow:
-        0 0 6px var(--terminal-glow);
+    text-shadow: 0 0 6px var(--terminal-glow);
 }
 
 .title span {
@@ -86,9 +79,7 @@ header::before {
 
     background-color: var(--terminal-surface);
 
-    border:
-        1px solid
-        var(--terminal-border);
+    border: 1px solid var(--terminal-border);
 
     color: var(--terminal-text-muted);
 

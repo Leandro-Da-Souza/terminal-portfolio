@@ -2,29 +2,13 @@ section.terminal-window {
     position: relative;
 
     background:
-        radial-gradient(
-            circle at top,
-            var(--terminal-overlay-strong),
-            transparent 40%
-        ),
-
-        linear-gradient(
-            to bottom,
-            var(--terminal-overlay-soft),
-            transparent 20%
-        ),
-
-        linear-gradient(
-            to right,
-            var(--terminal-scanline),
-            transparent 35%
-        ),
-
-        var(--terminal-bg);
+        radial-gradient(circle at top, var(--terminal-overlay-strong), transparent 40%),
+        linear-gradient(to bottom, var(--terminal-overlay-soft), transparent 20%),
+        linear-gradient(to right, var(--terminal-scanline), transparent 35%), var(--terminal-bg);
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.03),
-        inset 0 -1px 0 rgba(0,0,0,0.35);
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.35);
 
     color: var(--terminal-text);
 
@@ -39,7 +23,6 @@ section.terminal-window {
 
     transform-origin: center center;
     will-change: transform, opacity, filter;
-    
 }
 
 section.terminal-window::before {
@@ -50,18 +33,16 @@ section.terminal-window::before {
 
     pointer-events: none;
 
-    background-image:
-        repeating-linear-gradient(
-            to bottom,
-            transparent 0px,
-            transparent 2px,
-            rgba(255,255,255,0.08) 3.5px
-        );
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(255, 255, 255, 0.08) 6px
+    );
 
     mix-blend-mode: soft-light;
 
-    animation:
-        scanlines 14s linear infinite;
+    animation: scanlines 14s linear infinite;
 }
 
 section.terminal-window::after {
@@ -71,17 +52,16 @@ section.terminal-window::after {
 
     pointer-events: none;
 
-    background:
-        linear-gradient(
-            to bottom,
-            transparent 0%,
-            transparent 47%,
-            rgba(255,255,255,0.95) 49%,
-            rgba(255,255,255,1) 50%,
-            rgba(255,255,255,0.95) 51%,
-            transparent 53%,
-            transparent 100%
-        );
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 47%,
+        rgba(255, 255, 255, 0.95) 49%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.95) 51%,
+        transparent 53%,
+        transparent 100%
+    );
 
     opacity: 0;
 
@@ -96,9 +76,7 @@ main {
 
     background-color: var(--terminal-panel);
 
-    border:
-        1px solid
-        var(--terminal-border);
+    border: 1px solid var(--terminal-border);
 
     box-shadow:
         0 0 20px var(--terminal-shadow),
@@ -108,8 +86,7 @@ main {
 
     overflow: hidden;
 
-    transition:
-        opacity 120ms ease;
+    transition: opacity 120ms ease;
 }
 
 section.terminal-content {
@@ -140,17 +117,15 @@ span.tooltip {
     padding-top: var(--space-lg);
     margin-bottom: 0.5rem;
 
-    font-size: 0.80rem;
+    font-size: 0.8rem;
 }
 
 .terminal-window.closing {
-    animation:
-        crtShutdown 0.45s ease-out;
+    animation: crtShutdown 0.45s ease-out;
 }
 
 .terminal-window.closing::after {
-    animation:
-        crtFlash 180ms ease-out;
+    animation: crtFlash 180ms ease-out;
 }
 
 .terminal-window.closed main {
@@ -159,8 +134,7 @@ span.tooltip {
 }
 
 .terminal-window.opening {
-    animation:
-        crtBootup 0.45s ease-out;
+    animation: crtBootup 0.45s ease-out;
 }
 
 section.terminal-overlay {
@@ -172,17 +146,14 @@ section.terminal-overlay {
     align-items: center;
     justify-content: center;
 
-    background:
-        rgba(0,0,0,0.92);
+    background: rgba(0, 0, 0, 0.92);
 
     z-index: 20;
     opacity: 0;
 
-    transition:
-        opacity 180ms ease;
+    transition: opacity 180ms ease;
 
     pointer-events: none;
-    
 }
 
 .terminal-window.closed .terminal-overlay {
@@ -194,14 +165,11 @@ section.terminal-overlay {
 .reboot-button {
     background: transparent;
 
-    border:
-        1px solid var(--terminal-border);
+    border: 1px solid var(--terminal-border);
 
     color: var(--terminal-accent);
 
-    padding:
-        var(--space-md)
-        var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
 
     font-family: var(--font-terminal);
 
@@ -211,8 +179,7 @@ section.terminal-overlay {
 
     letter-spacing: 0.08em;
 
-    animation:
-        rebootPulse 2s ease-in-out infinite;
+    animation: rebootPulse 2s ease-in-out infinite;
 }
 
 @keyframes scanlines {
@@ -234,9 +201,7 @@ section.terminal-overlay {
 
     70% {
         transform: scaleY(0.02);
-        filter:
-            brightness(8)
-            blur(1px);
+        filter: brightness(8) blur(1px);
     }
 
     100% {
@@ -255,9 +220,7 @@ section.terminal-overlay {
     20% {
         opacity: 1;
         transform: scaleY(0.02);
-        filter:
-            brightness(8)
-            blur(1px);
+        filter: brightness(8) blur(1px);
     }
 
     60% {
@@ -273,7 +236,6 @@ section.terminal-overlay {
 }
 
 @keyframes crtFlash {
-
     0% {
         opacity: 0;
         transform: scaleY(1);
@@ -290,8 +252,8 @@ section.terminal-overlay {
     }
 }
 @keyframes rebootPulse {
-
-    0%, 100% {
+    0%,
+    100% {
         opacity: 0.7;
     }
 

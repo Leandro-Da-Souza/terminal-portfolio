@@ -4,15 +4,14 @@ pre.banner {
 
     color: var(--terminal-accent);
 
-    opacity: 0.30;
+    opacity: 0.3;
 
     font-family: var(--font-terminal);
 
-    font-size: 0.60rem;
+    font-size: 0.6rem;
     line-height: 1;
 
     white-space: pre;
 
-    text-shadow:
-        0 0 8px var(--terminal-glow);
+    text-shadow: 0 0 8px var(--terminal-glow);
 }

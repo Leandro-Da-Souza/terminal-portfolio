@@ -12,11 +12,8 @@ export class TerminalInput extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({
-            mode: 'open'
-        }).adoptedStyleSheets = [
-            baseStyleSheet,
-            terminalInputStyleSheet
-        ];
+            mode: 'open',
+        }).adoptedStyleSheets = [baseStyleSheet, terminalInputStyleSheet];
     }
 
     static define(tag = 'terminal-input'): void {

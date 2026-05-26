@@ -17,11 +17,8 @@ class TerminalWindow extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({
-            mode: 'open'
-        }).adoptedStyleSheets = [
-            baseStyleSheet,
-            terminalWindowStyleSheet
-        ];
+            mode: 'open',
+        }).adoptedStyleSheets = [baseStyleSheet, terminalWindowStyleSheet];
     }
 
     static define(tag = 'terminal-window'): void {
@@ -60,9 +57,7 @@ class TerminalWindow extends HTMLElement {
         this.terminalInput = this.shadowRoot!.querySelector(
             'terminal-input'
         ) as TerminalInput | null;
-        this.rebootButton = this.shadowRoot!.querySelector(
-            '.reboot-button'
-        ) as HTMLElement | null;
+        this.rebootButton = this.shadowRoot!.querySelector('.reboot-button') as HTMLElement | null;
 
         this.attachEventListeners();
         this.runBootSequence();
@@ -159,18 +154,12 @@ class TerminalWindow extends HTMLElement {
         return { name, args };
     }
 
-    private async executeCommand(
-        parsedCommand: ParsedCommand
-    ): Promise<CommandResult> {
-
+    private async executeCommand(parsedCommand: ParsedCommand): Promise<CommandResult> {
         if (this.isServerCommand(parsedCommand.name)) {
-
             this.setLoading(true);
 
             try {
-                return await this.sendCommandToServer(
-                    parsedCommand
-                );
+                return await this.sendCommandToServer(parsedCommand);
             } finally {
                 this.setLoading(false);
             }
@@ -269,9 +258,7 @@ class TerminalWindow extends HTMLElement {
         return command?.scope === 'server';
     }
 
-    private async sendCommandToServer(
-        parsedCommand: ParsedCommand
-    ): Promise<CommandResult> {
+    private async sendCommandToServer(parsedCommand: ParsedCommand): Promise<CommandResult> {
         try {
             const response = await fetch('http://localhost:3001/terminal/command', {
                 method: 'POST',
@@ -286,38 +273,27 @@ class TerminalWindow extends HTMLElement {
             });
 
             return (await response.json()) as CommandResult;
-
         } catch {
-            this.addSystemMessage(
-                SystemMessages.relayFailed
-            );
+            this.addSystemMessage(SystemMessages.relayFailed);
 
             return ServerErrorMessage;
-        } 
+        }
     }
 
     private runBootSequence(): void {
-
         this.isBooting = true;
-    
-        this.terminalInput?.setAttribute(
-            'disabled',
-            'true'
-        );
-    
-        BootSequence.forEach( (message, index, array) => {
-            setTimeout(() => {
 
+        this.terminalInput?.setAttribute('disabled', 'true');
+
+        BootSequence.forEach((message, index, array) => {
+            setTimeout(() => {
                 this.addSystemMessage(message);
 
                 if (index === array.length - 1) {
                     this.isBooting = false;
 
-                    this.terminalInput?.removeAttribute(
-                        'disabled'
-                    );
+                    this.terminalInput?.removeAttribute('disabled');
                 }
-
             }, index * 1200);
         });
     }
@@ -358,19 +334,17 @@ class TerminalWindow extends HTMLElement {
         this.terminalElement?.addEventListener('animationend', this.handleAnimationEnd);
     }
 
-    private addSystemMessage(
-        message: string
-    ): void {
-        if(message.trim() === '') return;
+    private addSystemMessage(message: string): void {
+        if (message.trim() === '') return;
 
         this.addTerminalEntry(
             {
                 name: '',
-                args: []
+                args: [],
             },
             message,
             'system'
-        )
+        );
     }
 
     private shutdownTerminal(): void {
@@ -382,16 +356,14 @@ class TerminalWindow extends HTMLElement {
     }
 
     private setLoading(loading: boolean): void {
-        if(this.isLoading === loading) return;
+        if (this.isLoading === loading) return;
 
         if (loading) {
-            this.addSystemMessage(
-                SystemMessages.relayConnecting
-            );
+            this.addSystemMessage(SystemMessages.relayConnecting);
         }
 
         this.isLoading = loading;
-        this.terminalInput?.setDisabled(loading)
+        this.terminalInput?.setDisabled(loading);
     }
 }
 

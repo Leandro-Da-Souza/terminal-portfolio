@@ -11,11 +11,8 @@ class TerminalEntry extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({
-            mode: 'open'
-        }).adoptedStyleSheets = [
-            baseStyleSheet,
-            terminalEntryStyleSheet
-        ];
+            mode: 'open',
+        }).adoptedStyleSheets = [baseStyleSheet, terminalEntryStyleSheet];
     }
 
     static define(tag = 'terminal-entry'): void {

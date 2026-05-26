@@ -7,10 +7,8 @@ class TerminalBanner extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({
-            mode: 'open'
-        }).adoptedStyleSheets = [
-            terminalBannerStyleSheet
-        ];
+            mode: 'open',
+        }).adoptedStyleSheets = [terminalBannerStyleSheet];
     }
 
     static define(tag = 'terminal-banner'): void {
@@ -41,7 +39,6 @@ class TerminalBanner extends HTMLElement {
             </pre>
         `;
     }
-
 }
 
 TerminalBanner.define();

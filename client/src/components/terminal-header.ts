@@ -11,11 +11,8 @@ class TerminalHeader extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({
-            mode: 'open'
-        }).adoptedStyleSheets = [
-            baseStyleSheet,
-            terminalHeaderStyleSheet
-        ];
+            mode: 'open',
+        }).adoptedStyleSheets = [baseStyleSheet, terminalHeaderStyleSheet];
     }
 
     static define(tag = 'terminal-header'): void {
