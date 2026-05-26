@@ -351,13 +351,7 @@ class TerminalWindow extends HTMLElement {
     private async commandHandler(command: string): Promise<void> {
         const parsedCommand = this.parseCommand(command);
 
-        if (this.isServerCommand(parsedCommand.name)) {
-            await this.sendCommandToServer(parsedCommand);
-
-            return;
-        }
-
-        const result = this.executeCommand(parsedCommand);
+        const result = await this.executeCommand(parsedCommand);
 
         this.handleCommandResult(parsedCommand, result);
 
@@ -370,7 +364,13 @@ class TerminalWindow extends HTMLElement {
         return { name, args };
     }
 
-    private executeCommand(parsedCommand: ParsedCommand): CommandResult {
+    private async executeCommand(
+        parsedCommand: ParsedCommand
+    ): Promise<CommandResult> {
+        if (this.isServerCommand(parsedCommand.name)) {
+            return this.sendCommandToServer(parsedCommand)
+        }
+
         const commandDef =
             ClientCommandRegistry[parsedCommand.name] || ClientCommandRegistry['default'];
 
@@ -464,7 +464,9 @@ class TerminalWindow extends HTMLElement {
         return command?.scope === 'server';
     }
 
-    private async sendCommandToServer(parsedCommand: ParsedCommand): Promise<void> {
+    private async sendCommandToServer(
+        parsedCommand: ParsedCommand
+    ): Promise<CommandResult> {
         try {
             const response = await fetch('http://localhost:3001/terminal/command', {
                 method: 'POST',
@@ -478,14 +480,14 @@ class TerminalWindow extends HTMLElement {
                 }),
             });
 
-            const result = (await response.json()) as CommandResult;
-
-            this.handleCommandResult(parsedCommand, result);
+            return (await response.json()) as CommandResult;
         } catch {
-            this.addTerminalEntry(parsedCommand, 'Unable to reach terminal server.', 'system');
-        } finally {
-            this.scrollToBottom();
-        }
+            return {
+                type: 'output',
+                output: 'Unable to reach terminal server.',
+                variant: 'system'
+            } satisfies CommandResult;
+        } 
     }
 
     private runBootSequence(): void {
