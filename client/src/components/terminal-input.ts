@@ -1,7 +1,7 @@
 import { baseStyles } from '../styles/base';
 import { CommandMetaData } from '../../../shared/metadata/command-metadata';
 
-class TerminalInput extends HTMLElement {
+export class TerminalInput extends HTMLElement {
     static get observedAttributes() {
         return ['disabled'];
     }
@@ -32,6 +32,14 @@ class TerminalInput extends HTMLElement {
 
     public get disabled(): boolean {
         return this.hasAttribute('disabled');
+    }
+
+    public setDisabled(disabled: boolean): void {
+        if (disabled) {
+            this.setAttribute('disabled', '');
+        } else {
+            this.removeAttribute('disabled');
+        }
     }
 
     protected render(): void {

@@ -2,8 +2,9 @@ import type { TerminalEntry } from '../../../shared/types/terminal';
 import type { CommandResult, CommandVariant, ParsedCommand } from '../../../shared/types/command';
 import { CommandMetaData } from '../../../shared/metadata/command-metadata';
 import { ClientCommandRegistry } from '../commands/client-registry';
-import { BootSequence, ServerErrorMessage } from '../commands/system-registry';
+import { BootSequence, SystemMessages, ServerErrorMessage } from '../commands/system-registry';
 import { baseStyles } from '../styles/base';
+import { TerminalInput } from './terminal-input';
 
 class TerminalWindow extends HTMLElement {
     constructor() {
@@ -17,7 +18,7 @@ class TerminalWindow extends HTMLElement {
 
     private terminalElement: HTMLElement | null = null;
 
-    private terminalInput: HTMLElement | null = null;
+    private terminalInput: TerminalInput | null = null;
 
     private rebootButton: HTMLElement | null = null;
 
@@ -38,8 +39,12 @@ class TerminalWindow extends HTMLElement {
         this.terminalElement = this.shadowRoot!.querySelector(
             'section.terminal-window'
         ) as HTMLElement | null;
-        this.terminalInput = this.shadowRoot!.querySelector('terminal-input') as HTMLElement | null;
-        this.rebootButton = this.shadowRoot!.querySelector('.reboot-button') as HTMLElement | null;
+        this.terminalInput = this.shadowRoot!.querySelector(
+            'terminal-input'
+        ) as TerminalInput | null;
+        this.rebootButton = this.shadowRoot!.querySelector(
+            '.reboot-button'
+        ) as HTMLElement | null;
 
         this.attachEventListeners();
         this.runBootSequence();
@@ -370,8 +375,18 @@ class TerminalWindow extends HTMLElement {
     private async executeCommand(
         parsedCommand: ParsedCommand
     ): Promise<CommandResult> {
+
         if (this.isServerCommand(parsedCommand.name)) {
-            return this.sendCommandToServer(parsedCommand)
+
+            this.setLoading(true);
+
+            try {
+                return await this.sendCommandToServer(
+                    parsedCommand
+                );
+            } finally {
+                this.setLoading(false);
+            }
         }
 
         const commandDef =
@@ -484,7 +499,12 @@ class TerminalWindow extends HTMLElement {
             });
 
             return (await response.json()) as CommandResult;
+
         } catch {
+            this.addSystemMessage(
+                SystemMessages.relayFailed
+            );
+
             return ServerErrorMessage;
         } 
     }
@@ -661,6 +681,19 @@ class TerminalWindow extends HTMLElement {
         this.terminalElement?.classList.remove('opening', 'closed');
 
         this.terminalElement?.classList.add('closing');
+    }
+
+    private setLoading(loading: boolean): void {
+        if(this.isLoading === loading) return;
+
+        if (loading) {
+            this.addSystemMessage(
+                SystemMessages.relayConnecting
+            );
+        }
+
+        this.isLoading = loading;
+        this.terminalInput?.setDisabled(loading)
     }
 }
 
