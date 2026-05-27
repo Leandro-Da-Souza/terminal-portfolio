@@ -42,8 +42,6 @@ class TerminalHeader extends HTMLElement {
                     <span>TERMINAL NODE</span>
                 </h3>
                 <section class="controls">
-                    <span class="maximize">+</span>
-                    <span class="minimize">_</span>
                     <span class="close">x</span>
                 </section>
             </header>
@@ -51,27 +49,10 @@ class TerminalHeader extends HTMLElement {
     }
 
     protected attachEventHandlers(): void {
-        this.maximize();
-        this.minimize();
         this.close();
     }
 
-    private maximize(): void {
-        // Implement maximize functionality
-        this.shadowRoot?.querySelector('.controls .maximize')?.addEventListener('click', () => {
-            this.dispatchEvent(new CustomEvent('maximize', { bubbles: true, composed: true }));
-        });
-    }
-
-    private minimize(): void {
-        // Implement minimize functionality
-        this.shadowRoot?.querySelector('.controls .minimize')?.addEventListener('click', () => {
-            this.dispatchEvent(new CustomEvent('minimize', { bubbles: true, composed: true }));
-        });
-    }
-
     private close(): void {
-        // Implement close functionality
         this.shadowRoot?.querySelector('.controls .close')?.addEventListener('click', () => {
             this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
         });

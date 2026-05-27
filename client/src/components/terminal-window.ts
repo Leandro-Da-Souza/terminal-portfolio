@@ -33,8 +33,6 @@ class TerminalWindow extends HTMLElement {
         }
     }
 
-    private fontSize: number = 13;
-
     private contentElement: HTMLElement | null = null;
 
     private terminalElement: HTMLElement | null = null;
@@ -114,23 +112,6 @@ class TerminalWindow extends HTMLElement {
     }
 
     protected attachEventListeners(): void {
-        this.shadowRoot?.addEventListener('minimize', () => {
-            this.fontSize -= 1;
-            document.documentElement.style.setProperty(
-                '--font-terminal-size',
-                `${this.fontSize}px`
-            );
-        });
-
-        this.shadowRoot?.addEventListener('maximize', () => {
-            console.log('Maximize event received');
-            this.fontSize += 1;
-            document.documentElement.style.setProperty(
-                '--font-terminal-size',
-                `${this.fontSize}px`
-            );
-        });
-
         this.shadowRoot?.addEventListener('close', () => {
             this.shutdownTerminal();
         });
