@@ -318,15 +318,19 @@ class TerminalWindow extends HTMLElement {
                 return;
             }
 
-            this.addSystemMessage(message.output);
-
             switch (message.type) {
                 case 'message':
+                    this.addSystemMessage(message.output);
                     break;
 
                 case 'complete':
+                    source.close()
+                    this.addSystemMessage(message.output || SystemMessages.relayDisconnected);
+                    break;
+
                 case 'error':
                     source.close();
+                    this.addSystemMessage(SystemMessages.relayFailed);
                     break;
             }
         };
