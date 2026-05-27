@@ -1,5 +1,10 @@
 import type { TerminalEntry } from '../../../shared/types/terminal';
-import type { CommandResult, CommandVariant, ParsedCommand } from '../../../shared/types/command';
+import type {
+    CommandEffect,
+    CommandResult,
+    CommandVariant,
+    ParsedCommand,
+} from '../../../shared/types/command';
 import { CommandMetaData } from '../../../shared/metadata/command-metadata';
 import { ClientCommandRegistry } from '../commands/client-registry';
 import { BootSequence, SystemMessages, ServerErrorMessage } from '../commands/system-registry';
@@ -155,29 +160,51 @@ class TerminalWindow extends HTMLElement {
     }
 
     private async executeCommand(parsedCommand: ParsedCommand): Promise<CommandResult> {
-        if (this.isServerCommand(parsedCommand.name)) {
-            this.setLoading(true);
+        const metadata = CommandMetaData[parsedCommand.name];
 
-            try {
-                return await this.sendCommandToServer(parsedCommand);
-            } finally {
-                this.setLoading(false);
-            }
+        if (!metadata) {
+            return ClientCommandRegistry['default'].execute();
         }
 
-        const commandDef =
-            ClientCommandRegistry[parsedCommand.name] || ClientCommandRegistry['default'];
+        switch (metadata.transport) {
+            case 'local': {
+                return this.executeLocalCommand(parsedCommand);
+            }
 
-        return commandDef.execute(parsedCommand.args, CommandMetaData);
+            case 'request': {
+                this.setLoading(true);
+
+                try {
+                    return await this.executeServerCommand(parsedCommand);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            case 'stream':
+                return this.executeStreamCommand();
+        }
     }
 
     private handleCommandResult(parsedCommand: ParsedCommand, result: CommandResult): void {
-        if (result.output) {
-            this.addTerminalEntry(parsedCommand, result.output, result.variant);
-        }
+        switch (result.type) {
+            case 'output':
+                this.addTerminalEntry(parsedCommand, result.output, result.variant);
+                break;
 
-        if (result.type === 'effect') {
-            this.handleEffect(result.effect, result.parameter);
+            case 'effect':
+                if (result.output) {
+                    this.addTerminalEntry(parsedCommand, result.output);
+                }
+
+                this.handleEffect(result.effect, result.parameter);
+                break;
+            case 'stream':
+                this.addTerminalEntry(parsedCommand, '');
+                this.handleStream(result.endpoint);
+                break;
+            default:
+                break;
         }
     }
 
@@ -218,10 +245,7 @@ class TerminalWindow extends HTMLElement {
         content.appendChild(entry);
     }
 
-    private handleEffect(
-        effect: CommandResult['effect'],
-        parameter?: CommandResult['parameter']
-    ): void {
+    private handleEffect(effect: CommandEffect, parameter?: string): void {
         if (!effect) return;
 
         switch (effect) {
@@ -252,13 +276,7 @@ class TerminalWindow extends HTMLElement {
         }
     }
 
-    private isServerCommand(commandName: string): boolean {
-        const command = CommandMetaData[commandName];
-
-        return command?.scope === 'server';
-    }
-
-    private async sendCommandToServer(parsedCommand: ParsedCommand): Promise<CommandResult> {
+    private async executeServerCommand(parsedCommand: ParsedCommand): Promise<CommandResult> {
         try {
             const response = await fetch('http://localhost:3001/terminal/command', {
                 method: 'POST',
@@ -278,6 +296,38 @@ class TerminalWindow extends HTMLElement {
 
             return ServerErrorMessage;
         }
+    }
+
+    private executeLocalCommand(parsedCommand: ParsedCommand): CommandResult {
+        const commandDef =
+            ClientCommandRegistry[parsedCommand.name] || ClientCommandRegistry['default'];
+
+        return commandDef.execute(parsedCommand.args, CommandMetaData);
+    }
+
+    private handleStream(endpoint: string): void {
+        const source = new EventSource(endpoint);
+
+        source.onmessage = (event) => {
+            this.addSystemMessage(event.data);
+
+            if (event.data === 'COMPLETE...') {
+                source.close();
+            }
+        };
+
+        source.onerror = () => {
+            source.close();
+
+            this.addSystemMessage(SystemMessages.relayFailed);
+        };
+    }
+
+    private executeStreamCommand(): CommandResult {
+        return {
+            type: 'stream',
+            endpoint: 'http://localhost:3001/terminal/stream',
+        };
     }
 
     private runBootSequence(): void {

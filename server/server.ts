@@ -44,6 +44,32 @@ app.post('/terminal/command', (req: Request, res: Response) => {
     return res.json(commandDef.execute(parsedCommand.args));
 });
 
+app.get('/terminal/stream', (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+
+    res.setHeader('Cache-Control', 'no-cache');
+
+    res.setHeader('Connection', 'keep-alive');
+
+    const fakeData = ['INITIALIZING...', 'CONNECTING...', 'FETCHING...', 'COMPLETE...'];
+
+    const timers = fakeData.map((data, index) => {
+        return setTimeout(() => {
+            res.write(`data: ${data}\n\n`);
+
+            if (index === fakeData.length - 1) {
+                res.end();
+            }
+        }, 1200 * index);
+    });
+
+    req.on('close', () => {
+        timers.forEach((timer) => {
+            clearTimeout(timer);
+        });
+    });
+});
+
 function parseCommand(command: string): ParsedCommand {
     const [name = '', ...args] = command.trim().toLocaleLowerCase().split(/\s+/);
 
