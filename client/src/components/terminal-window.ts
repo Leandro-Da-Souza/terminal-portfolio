@@ -235,9 +235,11 @@ class TerminalWindow extends HTMLElement {
         if (!content) return;
 
         const entry = document.createElement('terminal-entry');
+        const resolvedVariant = variant || 'command';
 
         entry.setAttribute('input', input);
         entry.setAttribute('output', output);
+        entry.setAttribute('animation-mode', resolvedVariant === 'system' ? 'word' : 'character');
 
         if (variant) {
             entry.setAttribute('variant', variant);
@@ -324,7 +326,7 @@ class TerminalWindow extends HTMLElement {
                     break;
 
                 case 'complete':
-                    source.close()
+                    source.close();
                     this.addSystemMessage(message.output || SystemMessages.relayDisconnected);
                     break;
 

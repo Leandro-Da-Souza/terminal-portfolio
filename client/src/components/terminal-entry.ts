@@ -7,6 +7,8 @@ terminalEntryStyleSheet.replaceSync(cssText);
 const baseStyleSheet = new CSSStyleSheet();
 baseStyleSheet.replaceSync(baseText);
 
+type OutputAnimationMode = 'word' | 'character';
+
 class TerminalEntry extends HTMLElement {
     constructor() {
         super();
@@ -23,7 +25,7 @@ class TerminalEntry extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        this.renderOutputAnimation(this.output);
+        this.renderOutputAnimation(this.output, this.animationMode);
     }
 
     public get input(): string {
@@ -36,6 +38,16 @@ class TerminalEntry extends HTMLElement {
 
     public get variant(): 'command' | 'system' {
         return (this.getAttribute('variant') as 'command' | 'system') || 'command';
+    }
+
+    public get animationMode(): OutputAnimationMode {
+        const mode = this.getAttribute('animation-mode');
+
+        if (mode === 'word' || mode === 'character') {
+            return mode;
+        }
+
+        return this.variant === 'system' ? 'word' : 'character';
     }
 
     protected render(): void {
@@ -76,7 +88,19 @@ class TerminalEntry extends HTMLElement {
             .replace(/'/g, '&#039;');
     }
 
-    private renderOutputAnimation(output: string) {
+    private renderOutputAnimation(output: string, mode: OutputAnimationMode): void {
+        switch (mode) {
+            case 'word':
+                this.renderWordOutputAnimation(output);
+                break;
+
+            case 'character':
+                this.renderCharacterOutputAnimation(output);
+                break;
+        }
+    }
+
+    private renderWordOutputAnimation(output: string): void {
         const words = output.split(' ');
 
         const outputContainer = this.shadowRoot?.querySelector('.output');
@@ -100,6 +124,27 @@ class TerminalEntry extends HTMLElement {
                     })
                 );
             }, index * 200);
+        });
+    }
+
+    private renderCharacterOutputAnimation(output: string): void {
+        const outputContainer = this.shadowRoot?.querySelector('.output');
+
+        if (!outputContainer) return;
+
+        outputContainer.textContent = '';
+
+        Array.from(output).forEach((character, index) => {
+            setTimeout(() => {
+                outputContainer.textContent += character;
+
+                this.dispatchEvent(
+                    new CustomEvent('output-progress', {
+                        bubbles: true,
+                        composed: true,
+                    })
+                );
+            }, index * 24);
         });
     }
 }
