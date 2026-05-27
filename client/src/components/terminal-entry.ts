@@ -165,7 +165,7 @@ class TerminalEntry extends HTMLElement {
                 if (index === characters.length - 1) {
                     this.dispatchOutputComplete();
                 }
-            }, index * 24);
+            }, index * 16);
         });
     }
 
