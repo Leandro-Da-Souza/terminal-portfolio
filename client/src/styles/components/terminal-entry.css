@@ -34,8 +34,8 @@
 
     letter-spacing: 0.04em;
 
-    font-size: 0.65rem;
-
+    font-size: 0.60rem;
+    
     padding-left: var(--space-sm);
 }
 
@@ -44,7 +44,6 @@
     align-items: center;
 
     gap: var(--space-sm);
-
     color: var(--terminal-text-muted);
 
     text-transform: uppercase;
