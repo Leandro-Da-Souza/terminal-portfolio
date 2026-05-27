@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import type { Request, Response } from 'express';
 import type { CommandResult, ParsedCommand } from '../shared/types/command';
+import type { StreamMessage } from '../shared/types/stream';
 import { ServerCommandRegistry } from './commands/server-registry';
 
 const app = express();
@@ -55,9 +56,14 @@ app.get('/terminal/stream', (req: Request, res: Response) => {
 
     const timers = fakeData.map((data, index) => {
         return setTimeout(() => {
-            res.write(`data: ${data}\n\n`);
+            const isLastMessage = index === fakeData.length - 1;
 
-            if (index === fakeData.length - 1) {
+            writeStreamMessage(res, {
+                type: isLastMessage ? 'complete' : 'message',
+                output: data,
+            });
+
+            if (isLastMessage) {
                 res.end();
             }
         }, 1200 * index);
@@ -69,6 +75,10 @@ app.get('/terminal/stream', (req: Request, res: Response) => {
         });
     });
 });
+
+function writeStreamMessage(res: Response, message: StreamMessage): void {
+    res.write(`data: ${JSON.stringify(message)}\n\n`);
+}
 
 function parseCommand(command: string): ParsedCommand {
     const [name = '', ...args] = command.trim().toLocaleLowerCase().split(/\s+/);

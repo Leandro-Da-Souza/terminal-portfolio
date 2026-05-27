@@ -11,6 +11,7 @@ import { BootSequence, SystemMessages, ServerErrorMessage } from '../commands/sy
 import { TerminalInput } from './terminal-input';
 import baseText from '../styles/components/base.css?inline';
 import cssText from '../styles/components/terminal-window.css?inline';
+import type { StreamMessage } from '../../../shared/types/stream';
 
 const terminalWindowStyleSheet = new CSSStyleSheet();
 terminalWindowStyleSheet.replaceSync(cssText);
@@ -309,18 +310,49 @@ class TerminalWindow extends HTMLElement {
         const source = new EventSource(endpoint);
 
         source.onmessage = (event) => {
-            this.addSystemMessage(event.data);
+            const message = this.parseStreamMessage(event.data);
 
-            if (event.data === 'COMPLETE...') {
+            if (!message) {
                 source.close();
+                this.addSystemMessage(SystemMessages.relayFailed);
+                return;
+            }
+
+            this.addSystemMessage(message.output);
+
+            switch (message.type) {
+                case 'message':
+                    break;
+
+                case 'complete':
+                case 'error':
+                    source.close();
+                    break;
             }
         };
 
         source.onerror = () => {
             source.close();
-
             this.addSystemMessage(SystemMessages.relayFailed);
         };
+    }
+
+    private parseStreamMessage(data: string): StreamMessage | null {
+        try {
+            const message = JSON.parse(data) as Partial<StreamMessage>;
+
+            if (
+                !message ||
+                typeof message.output !== 'string' ||
+                !['message', 'complete', 'error'].includes(message.type ?? '')
+            ) {
+                return null;
+            }
+
+            return message as StreamMessage;
+        } catch {
+            return null;
+        }
     }
 
     private executeStreamCommand(): CommandResult {
