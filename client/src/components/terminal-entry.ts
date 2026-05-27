@@ -73,8 +73,14 @@ class TerminalEntry extends HTMLElement {
 
                 </div>
             
-                <div class="output">
-                </div>
+                ${
+                    this.output
+                        ? `
+                            <div class="output">
+                            </div>
+                        `
+                        : ''
+                }
             </section>
         `;
     }
@@ -89,6 +95,11 @@ class TerminalEntry extends HTMLElement {
     }
 
     private renderOutputAnimation(output: string, mode: OutputAnimationMode): void {
+        if (output === '') {
+            this.dispatchOutputComplete();
+            return;
+        }
+
         switch (mode) {
             case 'word':
                 this.renderWordOutputAnimation(output);
@@ -123,6 +134,10 @@ class TerminalEntry extends HTMLElement {
                         composed: true,
                     })
                 );
+
+                if (index === words.length - 1) {
+                    this.dispatchOutputComplete();
+                }
             }, index * 200);
         });
     }
@@ -134,7 +149,9 @@ class TerminalEntry extends HTMLElement {
 
         outputContainer.textContent = '';
 
-        Array.from(output).forEach((character, index) => {
+        const characters = Array.from(output);
+
+        characters.forEach((character, index) => {
             setTimeout(() => {
                 outputContainer.textContent += character;
 
@@ -144,8 +161,21 @@ class TerminalEntry extends HTMLElement {
                         composed: true,
                     })
                 );
+
+                if (index === characters.length - 1) {
+                    this.dispatchOutputComplete();
+                }
             }, index * 24);
         });
+    }
+
+    private dispatchOutputComplete(): void {
+        this.dispatchEvent(
+            new CustomEvent('output-complete', {
+                bubbles: true,
+                composed: true,
+            })
+        );
     }
 }
 

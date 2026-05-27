@@ -51,6 +51,10 @@ class TerminalWindow extends HTMLElement {
 
     private isOpen: boolean = true;
 
+    private renderQueue: Promise<void> = Promise.resolve();
+
+    private renderQueueVersion: number = 0;
+
     connectedCallback() {
         this.render();
 
@@ -231,8 +235,25 @@ class TerminalWindow extends HTMLElement {
     }
 
     private appendTerminalEntry(input: string, output: string, variant?: CommandVariant): void {
+        const queueVersion = this.renderQueueVersion;
+
+        this.renderQueue = this.renderQueue
+            .then(() => this.renderQueuedTerminalEntry(input, output, variant, queueVersion))
+            .catch((error: unknown) => {
+                console.error('Failed to render terminal entry:', error);
+            });
+    }
+
+    private renderQueuedTerminalEntry(
+        input: string,
+        output: string,
+        variant: CommandVariant | undefined,
+        queueVersion: number
+    ): Promise<void> {
         const content = this.contentElement;
-        if (!content) return;
+        if (!content || queueVersion !== this.renderQueueVersion) {
+            return Promise.resolve();
+        }
 
         const entry = document.createElement('terminal-entry');
         const resolvedVariant = variant || 'command';
@@ -245,7 +266,17 @@ class TerminalWindow extends HTMLElement {
             entry.setAttribute('variant', variant);
         }
 
-        content.appendChild(entry);
+        return new Promise((resolve) => {
+            entry.addEventListener(
+                'output-complete',
+                () => {
+                    resolve();
+                },
+                { once: true }
+            );
+
+            content.appendChild(entry);
+        });
     }
 
     private handleEffect(effect: CommandEffect, parameter?: string): void {
@@ -260,6 +291,9 @@ class TerminalWindow extends HTMLElement {
                 if (content) {
                     content.innerHTML = '';
                 }
+
+                this.renderQueueVersion += 1;
+                this.renderQueue = Promise.resolve();
 
                 break;
             case 'theme-change':
