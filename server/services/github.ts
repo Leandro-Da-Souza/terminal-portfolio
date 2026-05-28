@@ -10,8 +10,8 @@ export async function getRepositories() {
             await octokit.request(
                 'GET /users/{username}/repos',
                 {
-                    username:
-                        'Leandro-Da-Souza',
+                    username: 'Leandro-Da-Souza',
+                    per_page: 100,
                 }
         );
 
