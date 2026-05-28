@@ -1,9 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import 'dotenv/config';
 import type { Request, Response } from 'express';
+
 import type { CommandResult, ParsedCommand } from '../shared/types/command';
 import type { StreamMessage } from '../shared/types/stream';
 import { ServerCommandRegistry } from './commands/server-registry';
+import { getRepositories } from './services/github';
 
 const app = express();
 const PORT = 3001;
@@ -16,8 +19,20 @@ app.use(
 
 app.use(express.json());
 
-app.get('/', (_, res: Response) => {
-    res.send('server alive');
+app.get('/', async (_, res: Response) => {
+
+    try {
+        const repos = await getRepositories()
+
+        res.json(repos)
+    } catch(error) {
+        res.status(500).json({
+            error:
+                error instanceof Error
+                    ? error.message
+                    : 'Unknown error'
+        });
+    }
 });
 
 app.post('/terminal/command', (req: Request, res: Response) => {
