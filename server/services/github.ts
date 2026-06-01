@@ -62,6 +62,7 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
                 return {
                     ...repo,
                     name: repo.name,
+                    displayName: featured.displayName,
                     description:
                         featured.descriptionOverride ??
                         repo.description,

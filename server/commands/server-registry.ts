@@ -122,13 +122,20 @@ dasouza.leandro@gmail.com`.trim(),
 
             return {
                 type: 'output',
-                output: projects.map(project => 
-                    [
-                        project.name,
-                        project.description,
-                        project.url,
-                    ].join('\n')
-                ).join('\n\n')
+                output: [
+                    'PROJECTS',
+                    '────────',
+                    ...projects.map(project =>
+                        [
+                            `[${project.priority}] ${project.displayName}`,
+                            '',
+                            project.description,
+                            '',
+                            `Repository:`,
+                            project.url,
+                        ].join('\n')
+                    )
+                ].join('\n\n')
             };
         },
     },
