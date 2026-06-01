@@ -13,7 +13,19 @@ function normalizeRepoName(value: string) : string {
         .replace(/[^a-z0-9]/g, '');
 }
 
+let cachedprojects: PortfolioProject[] | null = null;
+let cachedTimestamp = 0
+const CACHE_DURATION = 1000 * 60 * 5;
+
 export async function getRepositories(): Promise<PortfolioProject[]> {
+
+    if(cachedprojects && Date.now() - cachedTimestamp < CACHE_DURATION) {
+        console.log('returning cached projects');
+        return cachedprojects;
+    }
+
+    console.log('fetching projects');
+
     try {
         const response =
             await octokit.request(
@@ -30,7 +42,7 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
             url: repo.html_url,
         } satisfies ProjectType ));
 
-        return FeaturedProjects.map(featured => {
+        const projects = FeaturedProjects.map(featured => {
                 const repo = repositories.find(
                     repository =>
                         normalizeRepoName(repository.name) 
@@ -46,7 +58,7 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
         
                     return null;
                 }
-        
+
                 return {
                     ...repo,
                     name: repo.name,
@@ -55,9 +67,15 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
                         repo.description,
                     priority:
                         featured.priority,
-                };
+                }
+
             })
             .filter((project): project is PortfolioProject => project !== null);
+
+        cachedprojects = projects;
+        cachedTimestamp = Date.now();
+
+        return projects;
 
     } catch {
         throw new Error('Failed To fetch repositories')
