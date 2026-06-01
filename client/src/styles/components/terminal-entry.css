@@ -72,3 +72,17 @@
 
     text-shadow: 0 0 8px var(--terminal-glow);
 }
+
+.output a {
+    color: var(--terminal-accent);
+
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+
+    text-shadow: 0 0 8px var(--terminal-glow);
+}
+
+.output a:hover,
+.output a:focus-visible {
+    color: var(--terminal-text-bright);
+}

@@ -9,6 +9,17 @@ baseStyleSheet.replaceSync(baseText);
 
 type OutputAnimationMode = 'word' | 'character';
 
+type LinkSegment =
+    | {
+          type: 'text';
+          value: string;
+      }
+    | {
+          type: 'link';
+          value: string;
+          href: string;
+      };
+
 class TerminalEntry extends HTMLElement {
     constructor() {
         super();
@@ -136,6 +147,7 @@ class TerminalEntry extends HTMLElement {
                 );
 
                 if (index === words.length - 1) {
+                    this.renderLinkedOutput(outputContainer, output);
                     this.dispatchOutputComplete();
                 }
             }, index * 200);
@@ -163,10 +175,68 @@ class TerminalEntry extends HTMLElement {
                 );
 
                 if (index === characters.length - 1) {
+                    this.renderLinkedOutput(outputContainer, output);
                     this.dispatchOutputComplete();
                 }
             }, index * 16);
         });
+    }
+
+    private renderLinkedOutput(outputContainer: Element, output: string): void {
+        outputContainer.textContent = '';
+
+        this.getLinkSegments(output).forEach(segment => {
+            if (segment.type === 'text') {
+                outputContainer.append(document.createTextNode(segment.value));
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = segment.href;
+            link.textContent = segment.value;
+
+            if (!segment.href.startsWith('mailto:')) {
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+            }
+
+            outputContainer.append(link);
+        });
+    }
+
+    private getLinkSegments(output: string): LinkSegment[] {
+        const linkPattern = /(https?:\/\/[^\s]+|[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,})/g;
+        const segments: LinkSegment[] = [];
+        let currentIndex = 0;
+
+        for (const match of output.matchAll(linkPattern)) {
+            const value = match[0];
+            const matchIndex = match.index ?? 0;
+
+            if (matchIndex > currentIndex) {
+                segments.push({
+                    type: 'text',
+                    value: output.slice(currentIndex, matchIndex),
+                });
+            }
+
+            segments.push({
+                type: 'link',
+                value,
+                href: value.startsWith('http') ? value : `mailto:${value}`,
+            });
+
+            currentIndex = matchIndex + value.length;
+        }
+
+        if (currentIndex < output.length) {
+            segments.push({
+                type: 'text',
+                value: output.slice(currentIndex),
+            });
+        }
+
+        return segments;
     }
 
     private dispatchOutputComplete(): void {
