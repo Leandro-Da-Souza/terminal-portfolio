@@ -1,4 +1,5 @@
 import type { CommandRegistryType } from '../../shared/types/command';
+import { getRepositories } from '../services/github';
 
 export const ServerCommandRegistry: CommandRegistryType = {
     about: {
@@ -114,10 +115,20 @@ dasouza.leandro@gmail.com`.trim(),
         },
     },
     projects: {
-        execute: () => {
+        execute: async () => {
+            console.log('projects command hit')
+            const projects = await getRepositories();
+            projects.sort((a, b) => a.priority - b.priority)
+
             return {
                 type: 'output',
-                output: 'Here are some of my projects:\n- Project A\n- Project B\n- Project C',
+                output: projects.map(project => 
+                    [
+                        project.name,
+                        project.description,
+                        project.url,
+                    ].join('\n')
+                ).join('\n\n')
             };
         },
     },

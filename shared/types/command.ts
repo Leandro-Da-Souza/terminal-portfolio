@@ -41,7 +41,7 @@ export type CommandDefinition = {
     execute: (
         args?: string[], 
         registry?: Record<string, CommandMetaDataType>
-    ) => CommandResult;
+    ) => CommandResult | Promise<CommandResult>;
 };
 
 export type CommandRegistryType = {

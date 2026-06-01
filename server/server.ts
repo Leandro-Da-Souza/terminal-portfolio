@@ -35,29 +35,31 @@ app.get('/', async (_, res: Response) => {
     }
 });
 
-app.post('/terminal/command', (req: Request, res: Response) => {
+app.post('/terminal/command', async (req: Request, res: Response) => {
     const { command } = req.body;
 
     if (typeof command !== 'string') {
-        return res.status(400).json({
-            type: 'output',
-            output: 'Invalid command payload.',
-            variant: 'system',
-        } satisfies CommandResult);
+        return handleCommandError(res, 400, 'Invalid command payload.')
     }
 
     const parsedCommand = parseCommand(command);
     const commandDef = ServerCommandRegistry[parsedCommand.name];
 
     if (!commandDef) {
-        return res.status(404).json({
-            type: 'output',
-            output: 'Unknown server command.',
-            variant: 'system',
-        } satisfies CommandResult);
+        return handleCommandError(res, 404, 'Unknown server command.')
     }
 
-    return res.json(commandDef.execute(parsedCommand.args));
+    try {
+        const result =
+            await commandDef.execute(
+                parsedCommand.args
+            );
+
+        return res.json(result);
+    } catch {
+        return handleCommandError(res, 500, 'Failed To Execute command')
+    }
+
 });
 
 app.get('/terminal/stream', (req: Request, res: Response) => {
@@ -99,6 +101,14 @@ function parseCommand(command: string): ParsedCommand {
     const [name = '', ...args] = command.trim().toLocaleLowerCase().split(/\s+/);
 
     return { name, args };
+}
+
+function handleCommandError(response: Response, status: number, output: string) {
+    return response.status(status).json({
+        type: 'output',
+        output: output ?? 'Unknown server error',
+        variant: 'system'
+    } satisfies CommandResult)
 }
 
 app.listen(PORT, () => {

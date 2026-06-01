@@ -316,11 +316,11 @@ class TerminalWindow extends HTMLElement {
         }
     }
 
-    private executeLocalCommand(parsedCommand: ParsedCommand): CommandResult {
+    private async executeLocalCommand(parsedCommand: ParsedCommand): Promise<CommandResult> {
         const commandDef =
             ClientCommandRegistry[parsedCommand.name] || ClientCommandRegistry['default'];
 
-        return commandDef.execute(parsedCommand.args, CommandMetaData);
+        return await commandDef.execute(parsedCommand.args, CommandMetaData);
     }
 
     private handleStream(endpoint: string): void {
