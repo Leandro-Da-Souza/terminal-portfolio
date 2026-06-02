@@ -161,9 +161,12 @@ dasouza.leandro@gmail.com`.trim(),
                     project.description,
                     'Technologies',
                     '────────────',
+                    '',
                     ...project.topics,
+                    '',
                     'Repository',
                     '──────────',
+                    '',
                     project.url    
                 ].join('\n')
             }
