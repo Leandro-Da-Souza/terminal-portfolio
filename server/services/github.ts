@@ -1,5 +1,5 @@
 import { Octokit } from 'octokit';
-import type { ProjectType, PortfolioProject } from '../../shared/types/project'
+import type { GithubRepository, PortfolioProject } from '../../shared/types/project'
 import { FeaturedProjects } from '../../shared/data/projects'
 
 const octokit = new Octokit({
@@ -20,11 +20,9 @@ const CACHE_DURATION = 1000 * 60 * 5;
 export async function getRepositories(): Promise<PortfolioProject[]> {
 
     if(cachedprojects && Date.now() - cachedTimestamp < CACHE_DURATION) {
-        console.log('returning cached projects');
         return cachedprojects;
     }
 
-    console.log('fetching projects');
 
     try {
         const response =
@@ -36,11 +34,13 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
                 }
         );
 
-        const repositories = response.data.map(repo => ({
+        const repositories = response.data.map(repo => (
+        {
             name: repo.name,
             description: repo.description,
             url: repo.html_url,
-        } satisfies ProjectType ));
+            topics: repo.topics ?? []
+        } satisfies GithubRepository ));
 
         const projects = FeaturedProjects.map(featured => {
                 const repo = repositories.find(
@@ -64,7 +64,6 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
                     name: repo.name,
                     displayName: featured.displayName,
                     description:
-                        featured.descriptionOverride ??
                         repo.description,
                     priority:
                         featured.priority,

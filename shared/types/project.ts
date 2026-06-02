@@ -1,7 +1,8 @@
-export type ProjectType = {
+export type GithubRepository = {
     name: string,
     description: string | null,
     url: string
+    topics: string[]
 }
 
 export type ProjectMetaData = {
@@ -9,7 +10,6 @@ export type ProjectMetaData = {
     displayName: string
     feature: boolean,
     priority: number,
-    descriptionOverride?: string 
 }
 
 export type PortfolioProject = {
@@ -18,4 +18,5 @@ export type PortfolioProject = {
     displayName: string
     url: string;
     priority: number;
+    topics: string[]
 }
