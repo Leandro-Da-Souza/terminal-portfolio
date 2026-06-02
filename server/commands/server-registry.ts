@@ -1,5 +1,5 @@
-import type { CommandRegistryType } from '../../shared/types/command';
-import { getRepositories } from '../services/github';
+import type { CommandRegistryType, CommandResult } from '../../shared/types/command';
+import { getProject, getRepositories } from '../services/github';
 
 export const ServerCommandRegistry: CommandRegistryType = {
     about: {
@@ -116,25 +116,57 @@ dasouza.leandro@gmail.com`.trim(),
     },
     projects: {
         execute: async () => {
-            console.log('projects command hit')
             const projects = await getRepositories();
-            projects.sort((a, b) => a.priority - b.priority)
 
             return {
                 type: 'output',
                 output: [
-                    ...projects.map(project =>
-                        [
-                            `[${project.priority}] ${project.displayName}`,
-                            '',
-                            project.description,
-                            '',
-                            `Repository:`,
-                            project.url,
-                        ].join('\n')
-                    )
-                ].join('\n\n')
+                    'AVAILABLE PROJECTS',
+                    '──────────────────',
+                    '',
+                    ...projects.map(
+                        project =>
+                            `[${project.priority}] ${project.displayName}`
+                    ),
+                    '',
+                    'Use: project <name|number>',
+                ].join('\n')
             };
         },
     },
+    project: {
+        execute: async (args = []) => {
+
+            if (args.length === 0) {
+                return {
+                    type: 'output',
+                    output: 'Usage: project <name|number>'
+                }
+            }
+
+            const project = await getProject(args.join(' '));
+
+            if(!project) {
+                return {
+                    type: 'output',
+                    output: 'Project not found.'
+                }
+            }
+
+            return {
+                type: 'output',
+                output: [
+                    project.displayName,
+                    '',
+                    project.description,
+                    'Technologies',
+                    '────────────',
+                    ...project.topics,
+                    'Repository',
+                    '──────────',
+                    project.url    
+                ].join('\n')
+            }
+        }
+    }
 };

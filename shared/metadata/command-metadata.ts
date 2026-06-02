@@ -46,6 +46,11 @@ export const CommandMetaData: Record<string, CommandMetaDataType> = {
         scope: 'server',
         transport: 'request'
     },
+    project: {
+        description: 'view details about a project',
+        scope: 'server',
+        transport: 'request'
+    },
     stream: {
         description: 'Temp streaming channel',
         scope: 'client',

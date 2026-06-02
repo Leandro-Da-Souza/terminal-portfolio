@@ -23,7 +23,6 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
         return cachedprojects;
     }
 
-
     try {
         const response =
             await octokit.request(
@@ -70,7 +69,8 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
                 }
 
             })
-            .filter((project): project is PortfolioProject => project !== null);
+            .filter((project): project is PortfolioProject => project !== null)
+            .sort((a,b) => a.priority - b.priority);
 
         cachedprojects = projects;
         cachedTimestamp = Date.now();
@@ -81,3 +81,30 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
         throw new Error('Failed To fetch repositories')
     }
 };
+
+export async function getProject(
+    lookup: string
+): Promise<PortfolioProject | null> {
+
+    const projects =
+        await getRepositories();
+
+    const projectNumber =
+        Number(lookup);
+
+    if (!Number.isNaN(projectNumber)) {
+        return (
+            projects.find(
+                p => p.priority === projectNumber
+            ) ?? null
+        );
+    }
+
+    return (
+        projects.find(p =>
+                normalizeRepoName(p.displayName) 
+                    ===
+                normalizeRepoName(lookup)
+        ) ?? null
+    );
+}
