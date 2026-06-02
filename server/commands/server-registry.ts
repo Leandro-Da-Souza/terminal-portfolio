@@ -123,8 +123,6 @@ dasouza.leandro@gmail.com`.trim(),
             return {
                 type: 'output',
                 output: [
-                    'PROJECTS',
-                    '────────',
                     ...projects.map(project =>
                         [
                             `[${project.priority}] ${project.displayName}`,
