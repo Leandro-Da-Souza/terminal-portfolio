@@ -41,7 +41,9 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
             topics: repo.topics ?? []
         } satisfies GithubRepository ));
 
-        const projects = FeaturedProjects.map(featured => {
+        const projects = FeaturedProjects
+            .filter(project => project.feature)
+            .map(featured => {
                 const repo = repositories.find(
                     repository =>
                         normalizeRepoName(repository.name) 

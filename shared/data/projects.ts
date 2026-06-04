@@ -14,9 +14,15 @@ export const FeaturedProjects: ProjectMetaData[] = [
         priority: 2,
     },
     {
+        repo: 'portfolio-two',
+        displayName: 'Developer Portfolio',
+        feature: true,
+        priority: 3
+    },
+    {
         repo: 'airbean',
         displayName: 'Airbean',
         feature: true,
-        priority: 3, 
+        priority: 4, 
     }
 ]
