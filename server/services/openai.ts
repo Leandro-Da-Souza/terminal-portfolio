@@ -20,8 +20,7 @@ export async function askMachineSpirit(query: string) {
     }
 
     try {
-        const context = await buildMachineSpiritContext();
-        console.log(context.length)
+        const context = await buildMachineSpiritContext(query);
 
         const response = await client.responses.create({
             ...OPENAI_RESPONSE_CONFIG,

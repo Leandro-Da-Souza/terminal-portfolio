@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import 'dotenv/config';
 import type { Request, Response } from 'express';
 
@@ -11,13 +12,17 @@ import { getRepositories } from './services/github';
 const app = express();
 const PORT = 3001;
 
-app.use(
-    cors({
-        origin: 'http://localhost:5173',
-    })
-);
+app.use(cors({ 
+    origin: process.env.CLIENT_URL ?? 'http://localhost:5173'
+}));
 
 app.use(express.json());
+
+const rateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+})
 
 app.get('/', async (_, res: Response) => {
 
@@ -92,6 +97,10 @@ app.get('/terminal/stream', (req: Request, res: Response) => {
         });
     });
 });
+
+// app.post('/terminal/machine-spirit', rateLimiter, (req: Request, res: Response) => {
+
+// })
 
 function writeStreamMessage(res: Response, message: StreamMessage): void {
     res.write(`data: ${JSON.stringify(message)}\n\n`);
