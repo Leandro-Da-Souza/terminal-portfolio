@@ -23,6 +23,17 @@ type LiveTerminalEntry = HTMLElement & {
     setLiveOutput(output: string, complete?: boolean): void;
 };
 
+type TerminalHeaderElement = HTMLElement & {
+    mode: string | null;
+};
+
+const MachineSpiritBootSequence = [
+    'COGITATOR LINK ESTABLISHED',
+    'Accessing archive subsystems...',
+    'Synchronizing repository records...',
+    'Machine Spirit online.',
+];
+
 class TerminalWindow extends HTMLElement {
     constructor() {
         super();
@@ -46,6 +57,8 @@ class TerminalWindow extends HTMLElement {
     private terminalElement: HTMLElement | null = null;
 
     private terminalInput: TerminalInput | null = null;
+
+    private terminalHeader: TerminalHeaderElement | null = null;
 
     private rebootButton: HTMLElement | null = null;
 
@@ -73,8 +86,12 @@ class TerminalWindow extends HTMLElement {
         this.terminalInput = this.shadowRoot!.querySelector(
             'terminal-input'
         ) as TerminalInput | null;
+        this.terminalHeader = this.shadowRoot!.querySelector(
+            'terminal-header'
+        ) as TerminalHeaderElement | null;
         this.rebootButton = this.shadowRoot!.querySelector('.reboot-button') as HTMLElement | null;
 
+        this.setMachineSpiritMode(false);
         this.attachEventListeners();
         this.runBootSequence();
         this.animationStart();
@@ -146,6 +163,7 @@ class TerminalWindow extends HTMLElement {
         if (this.activeMode === 'machine-spirit' && command === 'exit') {
             this.activeMode = null;
             this.machineSpiritEndpoint = null;
+            this.setMachineSpiritMode(false);
             this.addSystemMessage('Machine spirit dormant.');
             return;
         }
@@ -210,7 +228,8 @@ class TerminalWindow extends HTMLElement {
             case 'mode': {
                 this.activeMode = result.mode;
                 this.machineSpiritEndpoint = result.endpoint;
-                this.addTerminalEntry(parsedCommand, 'Machine spirit awakened. Type exit to return.');
+                this.setMachineSpiritMode(result.mode === 'machine-spirit');
+                this.runMachineSpiritBootSequence();
                 break;
             }
 
@@ -285,11 +304,15 @@ class TerminalWindow extends HTMLElement {
         });
     }
 
-    private appendLiveTerminalEntry(input: string, variant?: CommandVariant): Promise<LiveTerminalEntry | null> {
+    private appendLiveTerminalEntry(
+        input: string,
+        variant?: CommandVariant,
+        animationMode: 'word' | 'character' = 'character'
+    ): Promise<LiveTerminalEntry | null> {
         const queueVersion = this.renderQueueVersion;
 
         const entryPromise = this.renderQueue.then(() => {
-            return this.renderQueuedLiveTerminalEntry(input, variant, queueVersion);
+            return this.renderQueuedLiveTerminalEntry(input, variant, animationMode, queueVersion);
         });
 
         this.renderQueue = entryPromise
@@ -304,6 +327,7 @@ class TerminalWindow extends HTMLElement {
     private renderQueuedLiveTerminalEntry(
         input: string,
         variant: CommandVariant | undefined,
+        animationMode: 'word' | 'character',
         queueVersion: number
     ): LiveTerminalEntry | null {
         const content = this.contentElement;
@@ -316,7 +340,7 @@ class TerminalWindow extends HTMLElement {
 
         entry.setAttribute('input', input);
         entry.setAttribute('output', '');
-        entry.setAttribute('animation-mode', 'character');
+        entry.setAttribute('animation-mode', animationMode);
 
         if (variant) {
             entry.setAttribute('variant', variant);
@@ -402,7 +426,7 @@ class TerminalWindow extends HTMLElement {
             return;
         }
 
-        const entry = await this.appendLiveTerminalEntry(input);
+        const entry = await this.appendLiveTerminalEntry(input, undefined, 'word');
 
         if (!entry) {
             this.addSystemMessage(SystemMessages.relayFailed);
@@ -477,6 +501,12 @@ class TerminalWindow extends HTMLElement {
         });
     }
 
+    private runMachineSpiritBootSequence(): void {
+        MachineSpiritBootSequence.forEach((message) => {
+            this.addSystemMessage(message);
+        });
+    }
+
     private handleAnimationEnd = (): void => {
         if (this.terminalElement?.classList.contains('closing')) {
             this.terminalElement.classList.remove('closing');
@@ -524,6 +554,17 @@ class TerminalWindow extends HTMLElement {
             message,
             'system'
         );
+    }
+
+    private setMachineSpiritMode(active: boolean): void {
+        if (active) {
+            this.terminalElement?.setAttribute('data-mode', 'machine-spirit');
+            this.terminalHeader?.setAttribute('mode', 'machine-spirit');
+            return;
+        }
+
+        this.terminalElement?.removeAttribute('data-mode');
+        this.terminalHeader?.removeAttribute('mode');
     }
 
     private shutdownTerminal(): void {

@@ -21,9 +21,22 @@ class TerminalHeader extends HTMLElement {
         }
     }
 
+    static get observedAttributes(): string[] {
+        return ['mode'];
+    }
+
     connectedCallback() {
         this.render();
         this.attachEventHandlers();
+    }
+
+    attributeChangedCallback(): void {
+        this.render();
+        this.attachEventHandlers();
+    }
+
+    public get mode(): string | null {
+        return this.getAttribute('mode');
     }
 
     protected render(): void {
@@ -35,11 +48,15 @@ class TerminalHeader extends HTMLElement {
     }
 
     protected markup(): string {
+        const isMachineSpiritMode = this.mode === 'machine-spirit';
+        const title = isMachineSpiritMode ? 'MACHINE SPIRIT' : 'DZS://RELAY';
+        const subtitle = isMachineSpiritMode ? 'ONLINE' : 'TERMINAL NODE';
+
         return `
             <header>
                 <h3 class="title">
-                    DZS://RELAY
-                    <span>TERMINAL NODE</span>
+                    ${title}
+                    <span>${subtitle}</span>
                 </h3>
                 <section class="controls">
                     <span class="close">x</span>

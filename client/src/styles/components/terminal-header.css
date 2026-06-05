@@ -51,6 +51,12 @@ header::before {
     text-shadow: 0 0 6px var(--terminal-glow);
 }
 
+:host([mode='machine-spirit']) .title {
+    text-shadow:
+        0 0 8px var(--terminal-glow),
+        0 0 14px var(--terminal-glow);
+}
+
 .title span {
     color: var(--terminal-text-muted);
 
@@ -59,6 +65,12 @@ header::before {
     letter-spacing: 0.12em;
 
     opacity: 0.55;
+}
+
+:host([mode='machine-spirit']) .title span {
+    color: var(--terminal-accent);
+
+    opacity: 0.82;
 }
 
 .controls {

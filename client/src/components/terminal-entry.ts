@@ -72,7 +72,8 @@ class TerminalEntry extends HTMLElement {
             this.renderLinkedOutput(outputContainer, output);
             this.dispatchOutputComplete();
         } else {
-            outputContainer.textContent = output;
+            outputContainer.textContent =
+                this.animationMode === 'word' ? this.getLiveWordOutput(output) : output;
         }
 
         this.dispatchOutputProgress();
@@ -238,6 +239,20 @@ class TerminalEntry extends HTMLElement {
         }
 
         return segments;
+    }
+
+    private getLiveWordOutput(output: string): string {
+        if (output === '' || /\s$/.test(output)) {
+            return output;
+        }
+
+        const lastWhitespaceIndex = output.search(/\s+\S*$/);
+
+        if (lastWhitespaceIndex <= 0) {
+            return output;
+        }
+
+        return output.slice(0, lastWhitespaceIndex);
     }
 
     private dispatchOutputProgress(): void {
