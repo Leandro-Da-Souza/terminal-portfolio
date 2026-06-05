@@ -419,6 +419,8 @@ class TerminalWindow extends HTMLElement {
     }
 
     private async handleMachineCommand(input: string): Promise<void> {
+        this.scrollToBottom();
+
         const endpoint = this.machineSpiritEndpoint;
 
         if (!endpoint) {
@@ -432,6 +434,8 @@ class TerminalWindow extends HTMLElement {
             this.addSystemMessage(SystemMessages.relayFailed);
             return;
         }
+
+        this.scrollToBottom();
 
         this.setLoading(true, false);
 
