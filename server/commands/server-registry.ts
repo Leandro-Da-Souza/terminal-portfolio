@@ -15,16 +15,15 @@ export const ServerCommandRegistry: CommandRegistryType = {
         execute() {
             return {
                 type: 'output',
-                output: PortfolioData.skills
+                output: PortfolioData.skills,
             };
         },
     },
-
     experience: {
         execute() {
             return {
                 type: 'output',
-                output: PortfolioData.experience
+                output: PortfolioData.experience,
             };
         },
     },
@@ -46,33 +45,29 @@ export const ServerCommandRegistry: CommandRegistryType = {
                     'AVAILABLE PROJECTS',
                     '──────────────────',
                     '',
-                    ...projects.map(
-                        project =>
-                            `[${project.priority}] ${project.displayName}`
-                    ),
+                    ...projects.map((project) => `[${project.priority}] ${project.displayName}`),
                     '',
                     'Use: project <name|number>',
-                ].join('\n')
+                ].join('\n'),
             };
         },
     },
     project: {
         execute: async (args = []) => {
-
             if (args.length === 0) {
                 return {
                     type: 'output',
-                    output: 'Usage: project <name|number>'
-                }
+                    output: 'Usage: project <name|number>',
+                };
             }
 
             const project = await getProject(args.join(' '));
 
-            if(!project) {
+            if (!project) {
                 return {
                     type: 'output',
-                    output: 'Project not found.'
-                }
+                    output: 'Project not found.',
+                };
             }
 
             return {
@@ -89,9 +84,9 @@ export const ServerCommandRegistry: CommandRegistryType = {
                     'Repository',
                     '──────────',
                     '',
-                    project.url    
-                ].join('\n')
-            }
-        }
-    }
+                    project.url,
+                ].join('\n'),
+            };
+        },
+    },
 };

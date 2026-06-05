@@ -1,5 +1,5 @@
-import { PortfolioData } from "../../shared/data/portfolio";
-import { getRepositories } from "./github";
+import { PortfolioData } from '../../shared/data/portfolio';
+import { getRepositories } from './github';
 
 export async function buildMachineSpiritContext(inputQuery: string): Promise<string> {
     const contextSections = [
@@ -7,19 +7,18 @@ export async function buildMachineSpiritContext(inputQuery: string): Promise<str
         getExperienceContext(),
         getSkillsContext(),
         getContactContext(),
-        await getProjectsContext()
-    ]
+        await getProjectsContext(),
+    ];
 
-    return contextSections.join(`\n\n`)
+    return contextSections.join(`\n\n`);
 }
 
 async function getProjectsContext(): Promise<string> {
     const projects = await getRepositories();
 
-    const projectContext =
-        projects
-            .map(project =>
-                `
+    const projectContext = projects
+        .map((project) =>
+            `
                 ${project.displayName}
 
                 ${project.description}
@@ -27,10 +26,10 @@ async function getProjectsContext(): Promise<string> {
                 Technologies:
                 ${project.topics.join(', ')}
                 `.trim()
-            )
+        )
         .join('\n\n');
-    
-        return `
+
+    return `
         PROJECTS
         
         ${projectContext}
@@ -42,7 +41,7 @@ function getContactContext(): string {
     CONTACT
 
     ${PortfolioData.contact}
-    `.trim()
+    `.trim();
 }
 
 function getAboutContext(): string {
@@ -57,7 +56,7 @@ function getAboutContext(): string {
     - Running
     - Reading
     - Muay Thai
-    `.trim()
+    `.trim();
 }
 
 function getExperienceContext(): string {
@@ -65,12 +64,12 @@ function getExperienceContext(): string {
     EXPERIENCE
 
     ${PortfolioData.experience}
-    `.trim()
+    `.trim();
 }
 
 function getSkillsContext(): string {
     return `
     SKILLS
     ${PortfolioData.skills}
-    `.trim()
+    `.trim();
 }

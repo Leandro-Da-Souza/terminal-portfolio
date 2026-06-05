@@ -185,7 +185,7 @@ class TerminalEntry extends HTMLElement {
     private renderLinkedOutput(outputContainer: Element, output: string): void {
         outputContainer.textContent = '';
 
-        this.getLinkSegments(output).forEach(segment => {
+        this.getLinkSegments(output).forEach((segment) => {
             if (segment.type === 'text') {
                 outputContainer.append(document.createTextNode(segment.value));
                 return;

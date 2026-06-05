@@ -12,9 +12,11 @@ import { getRepositories } from './services/github';
 const app = express();
 const PORT = 3001;
 
-app.use(cors({ 
-    origin: process.env.CLIENT_URL ?? 'http://localhost:5173'
-}));
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL ?? 'http://localhost:5173',
+    })
+);
 
 app.use(express.json());
 
@@ -22,20 +24,16 @@ const rateLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 5,
     standardHeaders: true,
-})
+});
 
 app.get('/', async (_, res: Response) => {
-
     try {
-        const repos = await getRepositories()
+        const repos = await getRepositories();
 
-        res.json(repos)
-    } catch(error) {
+        res.json(repos);
+    } catch (error) {
         res.status(500).json({
-            error:
-                error instanceof Error
-                    ? error.message
-                    : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 });
@@ -44,27 +42,23 @@ app.post('/terminal/command', async (req: Request, res: Response) => {
     const { command } = req.body;
 
     if (typeof command !== 'string') {
-        return handleCommandError(res, 400, 'Invalid command payload.')
+        return handleCommandError(res, 400, 'Invalid command payload.');
     }
 
     const parsedCommand = parseCommand(command);
     const commandDef = ServerCommandRegistry[parsedCommand.name];
 
     if (!commandDef) {
-        return handleCommandError(res, 404, 'Unknown server command.')
+        return handleCommandError(res, 404, 'Unknown server command.');
     }
 
     try {
-        const result =
-            await commandDef.execute(
-                parsedCommand.args
-            );
+        const result = await commandDef.execute(parsedCommand.args);
 
         return res.json(result);
     } catch {
-        return handleCommandError(res, 500, 'Failed To Execute command')
+        return handleCommandError(res, 500, 'Failed To Execute command');
     }
-
 });
 
 app.get('/terminal/stream', (req: Request, res: Response) => {
@@ -116,8 +110,8 @@ function handleCommandError(response: Response, status: number, output: string) 
     return response.status(status).json({
         type: 'output',
         output: output ?? 'Unknown server error',
-        variant: 'system'
-    } satisfies CommandResult)
+        variant: 'system',
+    } satisfies CommandResult);
 }
 
 app.listen(PORT, () => {

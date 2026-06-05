@@ -17,7 +17,7 @@ export const SystemMessages = {
 
     relayFailed: 'RELAY CONNECTION FAILED',
 
-    relayDisconnected: 'RELAY DISCONNECTED'
+    relayDisconnected: 'RELAY DISCONNECTED',
 };
 
 export const ServerErrorMessage = {

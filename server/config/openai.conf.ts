@@ -1,10 +1,10 @@
-import 'dotenv/config'
+import 'dotenv/config';
 
 export const OPENAI_CLIENT_CONFIG = {
     apiKey: process.env.OPENAI_API_KEY,
     maxRetries: 2,
     timeout: 10 * 1000,
-}
+};
 
 export const OPENAI_RESPONSE_CONFIG = {
     model: 'gpt-4.1-nano',
@@ -41,9 +41,9 @@ export const OPENAI_RESPONSE_CONFIG = {
 
     Keep responses under 150 words.
     `.trim(),
-    temperature: 1.5
-}
+    temperature: 1.5,
+};
 
 export const MACHINE_SPIRIT_CONFIG = {
-    maxUserQueryLength: 250
-}
+    maxUserQueryLength: 250,
+};
