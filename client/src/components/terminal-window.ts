@@ -1,6 +1,7 @@
 import type { TerminalEntry } from '../../../shared/types/terminal';
 import type {
     CommandEffect,
+    CommandMode,
     CommandResult,
     CommandVariant,
     ParsedCommand,
@@ -11,13 +12,16 @@ import { BootSequence, SystemMessages, ServerErrorMessage } from '../commands/sy
 import { TerminalInput } from './terminal-input';
 import baseText from '../styles/components/base.css?inline';
 import cssText from '../styles/components/terminal-window.css?inline';
-import type { StreamMessage } from '../../../shared/types/stream';
 
 const terminalWindowStyleSheet = new CSSStyleSheet();
 terminalWindowStyleSheet.replaceSync(cssText);
 
 const baseStyleSheet = new CSSStyleSheet();
 baseStyleSheet.replaceSync(baseText);
+
+type LiveTerminalEntry = HTMLElement & {
+    setLiveOutput(output: string, complete?: boolean): void;
+};
 
 class TerminalWindow extends HTMLElement {
     constructor() {
@@ -32,6 +36,10 @@ class TerminalWindow extends HTMLElement {
             customElements.define(tag, this);
         }
     }
+
+    private activeMode: CommandMode | null = null;
+
+    private machineSpiritEndpoint: string | null = null;
 
     private contentElement: HTMLElement | null = null;
 
@@ -130,6 +138,18 @@ class TerminalWindow extends HTMLElement {
     }
 
     private async commandHandler(command: string): Promise<void> {
+        if (this.activeMode === 'machine-spirit' && command !== 'exit') {
+            await this.handleMachineCommand(command);
+            return;
+        }
+
+        if (this.activeMode === 'machine-spirit' && command === 'exit') {
+            this.activeMode = null;
+            this.machineSpiritEndpoint = null;
+            this.addSystemMessage('Machine spirit dormant.');
+            return;
+        }
+
         const parsedCommand = this.parseCommand(command);
 
         const result = await this.executeCommand(parsedCommand);
@@ -167,28 +187,33 @@ class TerminalWindow extends HTMLElement {
                 }
             }
 
-            case 'stream':
-                return this.executeStreamCommand();
+            case 'mode': {
+                return this.executeModeSwitch(parsedCommand);
+            }
         }
     }
 
     private handleCommandResult(parsedCommand: ParsedCommand, result: CommandResult): void {
         switch (result.type) {
-            case 'output':
+            case 'output': {
                 this.addTerminalEntry(parsedCommand, result.output, result.variant);
                 break;
-
-            case 'effect':
+            }
+            case 'effect': {
                 if (result.output) {
                     this.addTerminalEntry(parsedCommand, result.output);
                 }
 
                 this.handleEffect(result.effect, result.parameter);
                 break;
-            case 'stream':
-                this.addTerminalEntry(parsedCommand, '');
-                this.handleStream(result.endpoint);
+            }
+            case 'mode': {
+                this.activeMode = result.mode;
+                this.machineSpiritEndpoint = result.endpoint;
+                this.addTerminalEntry(parsedCommand, 'Machine spirit awakened. Type exit to return.');
                 break;
+            }
+
             default:
                 break;
         }
@@ -260,6 +285,48 @@ class TerminalWindow extends HTMLElement {
         });
     }
 
+    private appendLiveTerminalEntry(input: string, variant?: CommandVariant): Promise<LiveTerminalEntry | null> {
+        const queueVersion = this.renderQueueVersion;
+
+        const entryPromise = this.renderQueue.then(() => {
+            return this.renderQueuedLiveTerminalEntry(input, variant, queueVersion);
+        });
+
+        this.renderQueue = entryPromise
+            .then(() => undefined)
+            .catch((error: unknown) => {
+                console.error('Failed to render live terminal entry:', error);
+            });
+
+        return entryPromise.catch(() => null);
+    }
+
+    private renderQueuedLiveTerminalEntry(
+        input: string,
+        variant: CommandVariant | undefined,
+        queueVersion: number
+    ): LiveTerminalEntry | null {
+        const content = this.contentElement;
+
+        if (!content || queueVersion !== this.renderQueueVersion) {
+            return null;
+        }
+
+        const entry = document.createElement('terminal-entry') as LiveTerminalEntry;
+
+        entry.setAttribute('input', input);
+        entry.setAttribute('output', '');
+        entry.setAttribute('animation-mode', 'character');
+
+        if (variant) {
+            entry.setAttribute('variant', variant);
+        }
+
+        content.appendChild(entry);
+
+        return entry;
+    }
+
     private handleEffect(effect: CommandEffect, parameter?: string): void {
         if (!effect) return;
 
@@ -323,64 +390,73 @@ class TerminalWindow extends HTMLElement {
         return await commandDef.execute(parsedCommand.args, CommandMetaData);
     }
 
-    private handleStream(endpoint: string): void {
-        const source = new EventSource(endpoint);
+    private async executeModeSwitch(command: ParsedCommand): Promise<CommandResult> {
+        return await this.executeServerCommand(command);
+    }
 
-        source.onmessage = (event) => {
-            const message = this.parseStreamMessage(event.data);
+    private async handleMachineCommand(input: string): Promise<void> {
+        const endpoint = this.machineSpiritEndpoint;
 
-            if (!message) {
-                source.close();
-                this.addSystemMessage(SystemMessages.relayFailed);
+        if (!endpoint) {
+            this.addSystemMessage(SystemMessages.relayFailed);
+            return;
+        }
+
+        const entry = await this.appendLiveTerminalEntry(input);
+
+        if (!entry) {
+            this.addSystemMessage(SystemMessages.relayFailed);
+            return;
+        }
+
+        this.setLoading(true, false);
+
+        try {
+            const response = await fetch(`http://localhost:3001${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: input,
+                }),
+            });
+
+            if (!response.ok || !response.body) {
+                entry.setLiveOutput(SystemMessages.relayFailed, true);
                 return;
             }
 
-            switch (message.type) {
-                case 'message':
-                    this.addSystemMessage(message.output);
-                    break;
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let output = '';
+            let isDone = false;
 
-                case 'complete':
-                    source.close();
-                    this.addSystemMessage(message.output || SystemMessages.relayDisconnected);
-                    break;
+            while (!isDone) {
+                const { done, value } = await reader.read();
+                isDone = done;
 
-                case 'error':
-                    source.close();
-                    this.addSystemMessage(SystemMessages.relayFailed);
-                    break;
-            }
-        };
-
-        source.onerror = () => {
-            source.close();
-            this.addSystemMessage(SystemMessages.relayFailed);
-        };
-    }
-
-    private parseStreamMessage(data: string): StreamMessage | null {
-        try {
-            const message = JSON.parse(data) as Partial<StreamMessage>;
-
-            if (
-                !message ||
-                typeof message.output !== 'string' ||
-                !['message', 'complete', 'error'].includes(message.type ?? '')
-            ) {
-                return null;
+                if (value) {
+                    output += decoder.decode(value, { stream: !done });
+                    entry.setLiveOutput(output);
+                }
             }
 
-            return message as StreamMessage;
+            output += decoder.decode();
+            const finalOutput = output || SystemMessages.relayFailed;
+
+            entry.setLiveOutput(finalOutput, true);
+
+            this.history.push({
+                input,
+                output: finalOutput,
+            });
         } catch {
-            return null;
+            entry.setLiveOutput(SystemMessages.relayFailed, true);
+        } finally {
+            this.setLoading(false);
+            this.scrollToBottom();
         }
-    }
-
-    private executeStreamCommand(): CommandResult {
-        return {
-            type: 'stream',
-            endpoint: 'http://localhost:3001/terminal/stream',
-        };
     }
 
     private runBootSequence(): void {
@@ -458,10 +534,10 @@ class TerminalWindow extends HTMLElement {
         this.terminalElement?.classList.add('closing');
     }
 
-    private setLoading(loading: boolean): void {
+    private setLoading(loading: boolean, announce = true): void {
         if (this.isLoading === loading) return;
 
-        if (loading) {
+        if (loading && announce) {
             this.addSystemMessage(SystemMessages.relayConnecting);
         }
 

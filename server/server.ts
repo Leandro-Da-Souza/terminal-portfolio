@@ -5,9 +5,9 @@ import 'dotenv/config';
 import type { Request, Response } from 'express';
 
 import type { CommandResult, ParsedCommand } from '../shared/types/command';
-import type { StreamMessage } from '../shared/types/stream';
 import { ServerCommandRegistry } from './commands/server-registry';
 import { getRepositories } from './services/github';
+import { askMachineSpirit } from './services/openai';
 
 const app = express();
 const PORT = 3001;
@@ -61,44 +61,35 @@ app.post('/terminal/command', async (req: Request, res: Response) => {
     }
 });
 
-app.get('/terminal/stream', (req: Request, res: Response) => {
-    res.setHeader('Content-Type', 'text/event-stream');
 
-    res.setHeader('Cache-Control', 'no-cache');
+app.post('/terminal/machine-spirit', rateLimiter, async (req: Request, res: Response) => {
+    const { query } = req.body;
 
-    res.setHeader('Connection', 'keep-alive');
+    if (typeof query !== 'string') {
+        return handleCommandError(res, 400, 'Invalid machine spirit payload.');
+    }
 
-    const fakeData = ['INITIALIZING...', 'CONNECTING...', 'FETCHING...', 'COMPLETE...'];
+    try {
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache');
 
-    const timers = fakeData.map((data, index) => {
-        return setTimeout(() => {
-            const isLastMessage = index === fakeData.length - 1;
+        const stream = await askMachineSpirit(query);
 
-            writeStreamMessage(res, {
-                type: isLastMessage ? 'complete' : 'message',
-                output: data,
-            });
-
-            if (isLastMessage) {
-                res.end();
+        for await (const event of stream) {
+            if (event.type === 'response.output_text.delta') {
+                res.write(event.delta);
             }
-        }, 1200 * index);
-    });
+        }
 
-    req.on('close', () => {
-        timers.forEach((timer) => {
-            clearTimeout(timer);
-        });
-    });
+        return res.end();
+    } catch {
+        if (res.headersSent) {
+            return res.end();
+        }
+
+        return handleCommandError(res, 500, 'Machine spirit unavailable.');
+    }
 });
-
-// app.post('/terminal/machine-spirit', rateLimiter, (req: Request, res: Response) => {
-
-// })
-
-function writeStreamMessage(res: Response, message: StreamMessage): void {
-    res.write(`data: ${JSON.stringify(message)}\n\n`);
-}
 
 function parseCommand(command: string): ParsedCommand {
     const [name = '', ...args] = command.trim().toLocaleLowerCase().split(/\s+/);

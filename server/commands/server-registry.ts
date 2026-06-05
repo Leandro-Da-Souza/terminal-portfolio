@@ -89,4 +89,13 @@ export const ServerCommandRegistry: CommandRegistryType = {
             };
         },
     },
+    'machine-spirit': {
+        execute: async () => {
+            return {
+                type: 'mode',
+                mode: 'machine-spirit',
+                endpoint: '/terminal/machine-spirit',
+            };
+        },
+    },
 };

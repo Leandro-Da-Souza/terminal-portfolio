@@ -47,13 +47,13 @@ export const CommandMetaData: Record<string, CommandMetaDataType> = {
         transport: 'request'
     },
     project: {
-        description: 'view details about a project',
+        description: 'View details about a project',
         scope: 'server',
         transport: 'request'
     },
-    stream: {
-        description: 'Temp streaming channel',
-        scope: 'client',
-        transport: 'stream'
+    'machine-spirit': {
+        description: 'Talk with machine spirit',
+        scope: 'server',
+        transport: 'mode'
     }
 }

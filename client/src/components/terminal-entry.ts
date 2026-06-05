@@ -61,6 +61,23 @@ class TerminalEntry extends HTMLElement {
         return this.variant === 'system' ? 'word' : 'character';
     }
 
+    public setLiveOutput(output: string, complete = false): void {
+        this.setAttribute('output', output);
+
+        const outputContainer = this.shadowRoot?.querySelector('.output');
+
+        if (!outputContainer) return;
+
+        if (complete) {
+            this.renderLinkedOutput(outputContainer, output);
+            this.dispatchOutputComplete();
+        } else {
+            outputContainer.textContent = output;
+        }
+
+        this.dispatchOutputProgress();
+    }
+
     protected render(): void {
         if (!this.shadowRoot) return;
 
@@ -84,14 +101,8 @@ class TerminalEntry extends HTMLElement {
 
                 </div>
             
-                ${
-                    this.output
-                        ? `
-                            <div class="output">
-                            </div>
-                        `
-                        : ''
-                }
+                <div class="output">
+                </div>
             </section>
         `;
     }
@@ -139,12 +150,7 @@ class TerminalEntry extends HTMLElement {
                     outputContainer.textContent += ` ${word}`;
                 }
 
-                this.dispatchEvent(
-                    new CustomEvent('output-progress', {
-                        bubbles: true,
-                        composed: true,
-                    })
-                );
+                this.dispatchOutputProgress();
 
                 if (index === words.length - 1) {
                     this.renderLinkedOutput(outputContainer, output);
@@ -167,12 +173,7 @@ class TerminalEntry extends HTMLElement {
             setTimeout(() => {
                 outputContainer.textContent += character;
 
-                this.dispatchEvent(
-                    new CustomEvent('output-progress', {
-                        bubbles: true,
-                        composed: true,
-                    })
-                );
+                this.dispatchOutputProgress();
 
                 if (index === characters.length - 1) {
                     this.renderLinkedOutput(outputContainer, output);
@@ -237,6 +238,15 @@ class TerminalEntry extends HTMLElement {
         }
 
         return segments;
+    }
+
+    private dispatchOutputProgress(): void {
+        this.dispatchEvent(
+            new CustomEvent('output-progress', {
+                bubbles: true,
+                composed: true,
+            })
+        );
     }
 
     private dispatchOutputComplete(): void {

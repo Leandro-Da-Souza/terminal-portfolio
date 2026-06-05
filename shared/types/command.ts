@@ -10,6 +10,7 @@ export type CommandEffect =
     | 'theme-change'
     | 'shutdown';
 
+export type CommandMode = 'machine-spirit';
 
 type OutputResult = {
     type: 'output',
@@ -24,17 +25,18 @@ type EffectResult = {
     output?: string
 }
 
-type StreamResult = {
-    type: 'stream',
+type ModeResult = {
+    type: 'mode',
+    mode: CommandMode,
     endpoint: string
 }
 
-export type CommandResult = OutputResult | EffectResult | StreamResult;
+export type CommandResult = OutputResult | EffectResult | ModeResult;
 
 export type CommandMetaDataType = {
     description: string;
     scope: 'client' | 'server';
-    transport: 'local' | 'request' | 'stream'
+    transport: 'local' | 'request' | 'mode'
 };
 
 export type CommandDefinition = {

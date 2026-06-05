@@ -22,8 +22,9 @@ export async function askMachineSpirit(query: string) {
     try {
         const context = await buildMachineSpiritContext(query);
 
-        const response = await client.responses.create({
+        const stream = await client.responses.create({
             ...OPENAI_RESPONSE_CONFIG,
+            stream: true,
             input: `
                 PORTFOLIO CONTEXT
                 ${context}
@@ -33,9 +34,7 @@ export async function askMachineSpirit(query: string) {
             `,
         });
 
-        console.log(response);
-
-        return response.output_text;
+        return stream;
     } catch (e) {
         console.error(e);
         throw new Error('Machine Spirit Unavailable');
