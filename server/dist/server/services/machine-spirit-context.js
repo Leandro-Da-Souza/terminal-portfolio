@@ -1,7 +1,6 @@
 import { PortfolioData } from '../../shared/data/portfolio.js';
 import { getRepositories } from './github.js';
-
-export async function buildMachineSpiritContext(inputQuery: string): Promise<string> {
+export async function buildMachineSpiritContext(inputQuery) {
     const contextSections = [
         getAboutContext(),
         getExperienceContext(),
@@ -9,42 +8,34 @@ export async function buildMachineSpiritContext(inputQuery: string): Promise<str
         getContactContext(),
         await getProjectsContext(),
     ];
-
     return contextSections.join(`\n\n`);
 }
-
-async function getProjectsContext(): Promise<string> {
+async function getProjectsContext() {
     const projects = await getRepositories();
-
     const projectContext = projects
-        .map((project) =>
-            `
+        .map((project) => `
                 ${project.displayName}
 
                 ${project.description}
 
                 Technologies:
                 ${project.topics.join(', ')}
-                `.trim()
-        )
+                `.trim())
         .join('\n\n');
-
     return `
         PROJECTS
         
         ${projectContext}
         `.trim();
 }
-
-function getContactContext(): string {
+function getContactContext() {
     return `
     CONTACT
 
     ${PortfolioData.contact}
     `.trim();
 }
-
-function getAboutContext(): string {
+function getAboutContext() {
     return `
     ABOUT
 
@@ -58,16 +49,14 @@ function getAboutContext(): string {
     - Muay Thai
     `.trim();
 }
-
-function getExperienceContext(): string {
+function getExperienceContext() {
     return `
     EXPERIENCE
 
     ${PortfolioData.experience}
     `.trim();
 }
-
-function getSkillsContext(): string {
+function getSkillsContext() {
     return `
     SKILLS
     ${PortfolioData.skills}

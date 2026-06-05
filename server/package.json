@@ -9,7 +9,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "format": "prettier --write .",
-        "server": "tsx watch server.ts"
+        "dev": "NODE_ENV=development tsx watch server.ts",
+        "build": "tsc",
+        "start": "NODE_ENV=production node dist/server/server.js"
     },
     "dependencies": {
         "cors": "^2.8.6",

@@ -1,8 +1,6 @@
-import type { CommandRegistryType } from '../../shared/types/command.js';
 import { getProject, getRepositories } from '../services/github.js';
 import { PortfolioData } from '../../shared/data/portfolio.js';
-
-export const ServerCommandRegistry: CommandRegistryType = {
+export const ServerCommandRegistry = {
     about: {
         execute: () => {
             return {
@@ -38,7 +36,6 @@ export const ServerCommandRegistry: CommandRegistryType = {
     projects: {
         execute: async () => {
             const projects = await getRepositories();
-
             return {
                 type: 'output',
                 output: [
@@ -60,16 +57,13 @@ export const ServerCommandRegistry: CommandRegistryType = {
                     output: 'Usage: project <name|number>',
                 };
             }
-
             const project = await getProject(args.join(' '));
-
             if (!project) {
                 return {
                     type: 'output',
                     output: 'Project not found.',
                 };
             }
-
             return {
                 type: 'output',
                 output: [

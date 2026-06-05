@@ -1,6 +1,6 @@
 import { Octokit } from 'octokit';
-import type { GithubRepository, PortfolioProject } from '../../shared/types/project';
-import { FeaturedProjects } from '../../shared/data/projects';
+import type { GithubRepository, PortfolioProject } from '../../shared/types/project.js';
+import { FeaturedProjects } from '../../shared/data/projects.js';
 
 const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
