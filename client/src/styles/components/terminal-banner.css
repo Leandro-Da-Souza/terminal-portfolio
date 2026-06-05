@@ -15,3 +15,9 @@ pre.banner {
 
     text-shadow: 0 0 8px var(--terminal-glow);
 }
+
+@media (max-width: 480px) {
+    pre.banner {
+        display: none;
+    }
+}

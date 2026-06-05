@@ -16,6 +16,8 @@ section.terminal-window {
 
     width: 100%;
     height: 100vh;
+    height: 100dvh;
+    min-height: 100dvh;
 
     padding: var(--space-lg);
 
@@ -236,6 +238,26 @@ section.terminal-overlay {
     letter-spacing: 0.08em;
 
     animation: rebootPulse 2s ease-in-out infinite;
+}
+
+@media (max-width: 480px) {
+    section.terminal-window {
+        padding: var(--space-xs);
+    }
+
+    main {
+        padding: var(--space-sm);
+    }
+
+    section.terminal-content {
+        padding-top:var(--space-md);
+        padding-right: 0;
+        padding-bottom: var(--space-lg);
+    }
+
+    span.tooltip {
+        padding-top: var(--space-sm);
+    }
 }
 
 @keyframes scanlines {

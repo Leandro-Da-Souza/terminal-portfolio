@@ -114,7 +114,7 @@ class TerminalWindow extends HTMLElement {
 
     protected markup(): string {
         return `
-            <section class="terminal-window">
+            <section class="terminal-window opening">
                 <section class="terminal-overlay">
                     <button class="reboot-button">
                         [ TERMINAL OFFLINE ]

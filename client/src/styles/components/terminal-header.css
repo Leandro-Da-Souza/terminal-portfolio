@@ -39,7 +39,10 @@ header::before {
 .title {
     display: flex;
     align-items: baseline;
+    flex-wrap: wrap;
     gap: 0.5rem;
+    min-width: 0;
+
     color: var(--terminal-accent);
 
     font-size: 0.75rem;
@@ -75,6 +78,7 @@ header::before {
 
 .controls {
     display: inline-flex;
+    flex-shrink: 0;
 
     gap: var(--space-xs);
 }
@@ -107,4 +111,21 @@ header::before {
     border-color: var(--terminal-accent);
 
     color: var(--terminal-accent);
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: var(--space-xs) var(--space-sm);
+        gap: var(--space-sm);
+    }
+
+    .title {
+        gap: 0.25rem;
+
+        font-size: 0.65rem;
+    }
+
+    .title span {
+        font-size: 0.52rem;
+    }
 }
