@@ -491,7 +491,7 @@ class TerminalWindow extends HTMLElement {
         } finally {
             this.setLoading(false);
             this.scrollToBottom();
-            this.terminalInput?.focusCommandInput();
+            this.focusInputIfAllowed();
         }
     }
 
@@ -631,7 +631,17 @@ class TerminalWindow extends HTMLElement {
         if (result.type === 'effect' && result.effect === 'shutdown') return;
 
         await this.renderQueue;
+        this.focusInputIfAllowed();
+    }
+
+    private focusInputIfAllowed(): void {
+        if (this.isMobileViewport()) return;
+
         this.terminalInput?.focusCommandInput();
+    }
+
+    private isMobileViewport(): boolean {
+        return window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches;
     }
 
     private updateTheme(theme: Theme) {
