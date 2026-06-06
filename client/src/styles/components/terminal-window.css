@@ -1,5 +1,6 @@
 section.terminal-window {
-    position: relative;
+    position: fixed;
+    inset: 0;
 
     background:
         radial-gradient(circle at top, var(--terminal-overlay-strong), transparent 40%),
@@ -250,13 +251,15 @@ section.terminal-overlay {
     }
 
     section.terminal-content {
-        padding-top:var(--space-md);
+        padding-top: var(--space-md);
         padding-right: 0;
         padding-bottom: var(--space-lg);
     }
 
     span.tooltip {
         padding-top: var(--space-sm);
+
+        font-size: 0.68rem;
     }
 }
 
