@@ -57,6 +57,8 @@ class TerminalWindow extends HTMLElement {
 
     private terminalHeader: TerminalHeaderElement | null = null;
 
+    private tooltipElement: HTMLElement | null = null;
+
     private rebootButton: HTMLElement | null = null;
 
     private history: TerminalEntry[] = [];
@@ -90,6 +92,7 @@ class TerminalWindow extends HTMLElement {
         this.terminalHeader = this.shadowRoot!.querySelector(
             'terminal-header'
         ) as TerminalHeaderElement | null;
+        this.tooltipElement = this.shadowRoot!.querySelector('.tooltip') as HTMLElement | null;
         this.rebootButton = this.shadowRoot!.querySelector('.reboot-button') as HTMLElement | null;
 
         this.setMachineSpiritMode(false);
@@ -601,11 +604,19 @@ class TerminalWindow extends HTMLElement {
         if (active) {
             this.terminalElement?.setAttribute('data-mode', 'machine-spirit');
             this.terminalHeader?.setAttribute('mode', 'machine-spirit');
+            this.setTooltipText("Type 'exit' to leave Machine Spirit mode.");
             return;
         }
 
         this.terminalElement?.removeAttribute('data-mode');
         this.terminalHeader?.removeAttribute('mode');
+        this.setTooltipText("Type 'help' to see available commands.");
+    }
+
+    private setTooltipText(text: string): void {
+        if (!this.tooltipElement) return;
+
+        this.tooltipElement.textContent = text;
     }
 
     private shutdownTerminal(): void {

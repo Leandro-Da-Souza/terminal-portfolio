@@ -40,13 +40,15 @@ section.terminal-window[data-mode='machine-spirit'] {
 }
 
 section.terminal-window[data-mode='machine-spirit'] main {
-    filter: brightness(1.08) saturate(1.08);
+    filter: brightness(1.13) saturate(1.12);
 
-    text-shadow: 0 0 7px var(--terminal-glow);
+    text-shadow:
+        0 0 8px var(--terminal-glow),
+        0 0 13px var(--terminal-glow);
 
     box-shadow:
-        0 0 26px var(--terminal-shadow),
-        inset 0 0 30px rgba(255, 255, 255, 0.025),
+        0 0 30px var(--terminal-shadow),
+        inset 0 0 38px rgba(255, 255, 255, 0.035),
         inset 0 0 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -75,12 +77,12 @@ section.terminal-window[data-mode='machine-spirit']::before {
         to bottom,
         transparent 0px,
         transparent 1px,
-        rgba(255, 255, 255, 0.12) 5px
+        rgba(255, 255, 255, 0.16) 5px
     );
 
-    opacity: 0.72;
+    opacity: 0.88;
 
-    animation: machineSpiritScanlines 9s linear infinite;
+    animation: machineSpiritScanlines 6.5s linear infinite;
 }
 
 section.terminal-window::after {
@@ -112,7 +114,7 @@ section.terminal-window[data-mode='machine-spirit']::after {
             to bottom,
             transparent 0px,
             transparent 18px,
-            rgba(255, 255, 255, 0.11) 19px,
+            rgba(255, 255, 255, 0.15) 19px,
             transparent 21px
         ),
         linear-gradient(
@@ -124,11 +126,11 @@ section.terminal-window[data-mode='machine-spirit']::after {
             transparent 76%
         );
 
-    opacity: 0.08;
+    opacity: 0.13;
 
     mix-blend-mode: screen;
 
-    animation: signalInterference 7s ease-in-out infinite;
+    animation: signalInterference 4.8s ease-in-out infinite;
 }
 
 main {
@@ -181,6 +183,14 @@ span.tooltip {
     margin-bottom: 0.5rem;
 
     font-size: 0.8rem;
+}
+
+section.terminal-window[data-mode='machine-spirit'] span.tooltip {
+    color: var(--terminal-accent);
+
+    opacity: 0.82;
+
+    text-shadow: 0 0 8px var(--terminal-glow);
 }
 
 .terminal-window.closing {
@@ -290,23 +300,23 @@ section.terminal-overlay {
 @keyframes signalInterference {
     0%,
     100% {
-        opacity: 0.055;
+        opacity: 0.08;
         transform: translateX(0);
     }
 
     24% {
-        opacity: 0.09;
-        transform: translateX(0.5px);
+        opacity: 0.15;
+        transform: translateX(0.85px);
     }
 
     47% {
-        opacity: 0.065;
-        transform: translateX(-0.75px);
+        opacity: 0.1;
+        transform: translateX(-1px);
     }
 
     71% {
-        opacity: 0.1;
-        transform: translateX(0.35px);
+        opacity: 0.17;
+        transform: translateX(0.65px);
     }
 }
 
