@@ -3,6 +3,7 @@ section.terminal-window {
     inset: 0;
 
     --keyboard-inset: 0px;
+    --viewport-height: 100dvh;
 
     background:
         radial-gradient(circle at top, var(--terminal-overlay-strong), transparent 40%),
@@ -19,11 +20,11 @@ section.terminal-window {
 
     width: 100%;
     height: 100vh;
-    height: 100dvh;
-    min-height: 100dvh;
+    height: var(--viewport-height);
+    min-height: var(--viewport-height);
 
     padding: var(--space-lg);
-    padding-bottom: calc(var(--space-lg) + var(--keyboard-inset));
+    padding-bottom: var(--space-lg);
 
     overflow: hidden;
 
@@ -247,7 +248,6 @@ section.terminal-overlay {
 @media (max-width: 480px) {
     section.terminal-window {
         padding: var(--space-xs);
-        padding-bottom: calc(var(--space-xs) + var(--keyboard-inset));
     }
 
     main {
