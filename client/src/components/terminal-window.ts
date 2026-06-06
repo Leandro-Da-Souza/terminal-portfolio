@@ -12,7 +12,7 @@ import { BootSequence, SystemMessages, ServerErrorMessage } from '../commands/sy
 import { TerminalInput } from './terminal-input';
 import baseText from '../styles/components/base.css?inline';
 import cssText from '../styles/components/terminal-window.css?inline';
-import { isTheme, type Theme } from '../../../shared/types/theme.js'
+import { isTheme, type Theme } from '../../../shared/types/theme.js';
 
 const terminalWindowStyleSheet = new CSSStyleSheet();
 terminalWindowStyleSheet.replaceSync(cssText);
@@ -94,6 +94,8 @@ class TerminalWindow extends HTMLElement {
 
         this.setMachineSpiritMode(false);
         this.attachEventListeners();
+        this.attachViewportListeners();
+        this.updateKeyboardInset();
         this.runBootSequence();
         this.animationStart();
         this.animationEnd();
@@ -103,6 +105,9 @@ class TerminalWindow extends HTMLElement {
         window.removeEventListener('keydown', this.handleKeydown);
 
         this.terminalElement?.removeEventListener('animationend', this.handleAnimationEnd);
+        window.visualViewport?.removeEventListener('resize', this.handleViewportChange);
+        window.visualViewport?.removeEventListener('scroll', this.handleViewportChange);
+        window.removeEventListener('resize', this.handleViewportChange);
     }
 
     protected render(): void {
@@ -547,6 +552,33 @@ class TerminalWindow extends HTMLElement {
         this.terminalElement?.addEventListener('animationend', this.handleAnimationEnd);
     }
 
+    private attachViewportListeners(): void {
+        window.visualViewport?.addEventListener('resize', this.handleViewportChange);
+        window.visualViewport?.addEventListener('scroll', this.handleViewportChange);
+        window.addEventListener('resize', this.handleViewportChange);
+    }
+
+    private handleViewportChange = (): void => {
+        this.updateKeyboardInset();
+        this.scrollToBottom();
+    };
+
+    private updateKeyboardInset(): void {
+        const visualViewport = window.visualViewport;
+
+        if (!visualViewport) {
+            this.terminalElement?.style.setProperty('--keyboard-inset', '0px');
+            return;
+        }
+
+        const inset = Math.max(
+            0,
+            window.innerHeight - visualViewport.height - visualViewport.offsetTop
+        );
+
+        this.terminalElement?.style.setProperty('--keyboard-inset', `${inset}px`);
+    }
+
     private addSystemMessage(message: string): void {
         if (message.trim() === '') return;
 
@@ -597,7 +629,7 @@ class TerminalWindow extends HTMLElement {
 
         const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
 
-        if(!favicon) return;
+        if (!favicon) return;
 
         favicon.href = `/${theme}.ico`;
     }

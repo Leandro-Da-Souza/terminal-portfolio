@@ -2,6 +2,8 @@ section.terminal-window {
     position: fixed;
     inset: 0;
 
+    --keyboard-inset: 0px;
+
     background:
         radial-gradient(circle at top, var(--terminal-overlay-strong), transparent 40%),
         linear-gradient(to bottom, var(--terminal-overlay-soft), transparent 20%),
@@ -21,6 +23,7 @@ section.terminal-window {
     min-height: 100dvh;
 
     padding: var(--space-lg);
+    padding-bottom: calc(var(--space-lg) + var(--keyboard-inset));
 
     overflow: hidden;
 
@@ -244,6 +247,7 @@ section.terminal-overlay {
 @media (max-width: 480px) {
     section.terminal-window {
         padding: var(--space-xs);
+        padding-bottom: calc(var(--space-xs) + var(--keyboard-inset));
     }
 
     main {
