@@ -12,6 +12,7 @@ import { BootSequence, SystemMessages, ServerErrorMessage } from '../commands/sy
 import { TerminalInput } from './terminal-input';
 import baseText from '../styles/components/base.css?inline';
 import cssText from '../styles/components/terminal-window.css?inline';
+import { isTheme, type Theme } from '../../../shared/types/theme.js'
 
 const terminalWindowStyleSheet = new CSSStyleSheet();
 terminalWindowStyleSheet.replaceSync(cssText);
@@ -48,10 +49,6 @@ class TerminalWindow extends HTMLElement {
         }
     }
 
-    private activeMode: CommandMode | null = null;
-
-    private machineSpiritEndpoint: string | null = null;
-
     private contentElement: HTMLElement | null = null;
 
     private terminalElement: HTMLElement | null = null;
@@ -73,6 +70,10 @@ class TerminalWindow extends HTMLElement {
     private renderQueue: Promise<void> = Promise.resolve();
 
     private renderQueueVersion: number = 0;
+
+    private activeMode: CommandMode | null = null;
+
+    private machineSpiritEndpoint: string | null = null;
 
     connectedCallback() {
         this.render();
@@ -370,10 +371,9 @@ class TerminalWindow extends HTMLElement {
                 break;
             case 'theme-change':
                 if (!parameter) return;
+                if (!isTheme(parameter)) return;
 
-                document.documentElement.setAttribute('data-theme', parameter);
-
-                localStorage.setItem('theme', parameter);
+                this.updateTheme(parameter);
 
                 break;
             case 'shutdown':
@@ -589,6 +589,19 @@ class TerminalWindow extends HTMLElement {
         this.isLoading = loading;
         this.terminalInput?.setDisabled(loading);
     }
+
+    private updateTheme(theme: Theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+
+        localStorage.setItem('theme', theme);
+
+        const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+
+        if(!favicon) return;
+
+        favicon.href = `/${theme}.ico`;
+    }
+
 }
 
 TerminalWindow.define();

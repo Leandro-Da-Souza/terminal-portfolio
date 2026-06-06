@@ -1,4 +1,5 @@
-import type { CommandRegistryType } from '../../../shared/types/command';
+import type { CommandRegistryType } from '../../../shared/types/command.js';
+import { isTheme, Themes } from '../../../shared/types/theme.js'
 
 export const ClientCommandRegistry: CommandRegistryType = {
     help: {
@@ -29,25 +30,22 @@ export const ClientCommandRegistry: CommandRegistryType = {
     },
     theme: {
         execute: (args) => {
-            const themes: string[] = ['rust', 'matrix', 'frost'];
-
             if (!args || args.length === 0) {
                 return {
                     type: 'output',
                     output:
                         'Please set a valid theme:\n' +
-                        '- theme rust\n' +
-                        '- theme matrix\n' +
-                        '- theme frost',
+                        Themes.map(theme => `- theme ${theme}`).join('\n')
                 };
             }
 
             const selectedTheme = args[0];
 
-            if (!themes.includes(selectedTheme)) {
+            if (!isTheme(selectedTheme)) {
                 return {
                     type: 'output',
-                    output: `"${selectedTheme}" is not a valid theme`,
+                    output: 'Please set a valid theme:\n' +
+                    Themes.map(theme => `- theme ${theme}`).join('\n')
                 };
             }
 
