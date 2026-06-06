@@ -71,7 +71,6 @@ export class TerminalInput extends HTMLElement {
                     class="command-input" 
                     placeholder="Enter command..."
                     ${this.disabled ? 'disabled' : ''} 
-                    autofocus 
                 />
             </div>
         `;
@@ -141,6 +140,12 @@ export class TerminalInput extends HTMLElement {
         this.dispatchEvent(
             new CustomEvent('command', { detail: command, bubbles: true, composed: true })
         );
+    }
+
+    public focusCommandInput(): void {
+        const input = this.shadowRoot?.querySelector('.command-input') as HTMLInputElement | null;
+
+        input?.focus({ preventScroll: true });
     }
 
     private pushToCommandHistory(command: string) {

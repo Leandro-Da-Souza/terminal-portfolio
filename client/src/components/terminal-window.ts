@@ -180,6 +180,8 @@ class TerminalWindow extends HTMLElement {
 
         this.handleCommandResult(parsedCommand, result);
 
+        await this.focusInputAfterOutput(result);
+
         this.scrollToBottom();
     }
 
@@ -489,6 +491,7 @@ class TerminalWindow extends HTMLElement {
         } finally {
             this.setLoading(false);
             this.scrollToBottom();
+            this.terminalInput?.focusCommandInput();
         }
     }
 
@@ -568,6 +571,7 @@ class TerminalWindow extends HTMLElement {
 
         if (!visualViewport) {
             this.terminalElement?.style.setProperty('--keyboard-inset', '0px');
+            this.terminalElement?.style.setProperty('--viewport-height', '100dvh');
             return;
         }
 
@@ -577,6 +581,7 @@ class TerminalWindow extends HTMLElement {
         );
 
         this.terminalElement?.style.setProperty('--keyboard-inset', `${inset}px`);
+        this.terminalElement?.style.setProperty('--viewport-height', `${visualViewport.height}px`);
     }
 
     private addSystemMessage(message: string): void {
@@ -620,6 +625,13 @@ class TerminalWindow extends HTMLElement {
 
         this.isLoading = loading;
         this.terminalInput?.setDisabled(loading);
+    }
+
+    private async focusInputAfterOutput(result: CommandResult): Promise<void> {
+        if (result.type === 'effect' && result.effect === 'shutdown') return;
+
+        await this.renderQueue;
+        this.terminalInput?.focusCommandInput();
     }
 
     private updateTheme(theme: Theme) {
