@@ -27,7 +27,7 @@ EXCLUDED_DIRS=(
 
 TEMP_DIR=$(mktemp -d)
 
-declare -A MOVED_FILES
+declare -A MOVED_FILES=()
 
 should_exclude() {
   local path="$1"
