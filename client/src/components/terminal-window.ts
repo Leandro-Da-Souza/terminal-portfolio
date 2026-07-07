@@ -35,6 +35,8 @@ const MachineSpiritBootSequence = [
     'Machine Spirit online.',
 ];
 
+const StartupCommand = 'about';
+
 class TerminalWindow extends HTMLElement {
     constructor() {
         super();
@@ -508,12 +510,19 @@ class TerminalWindow extends HTMLElement {
                 this.addSystemMessage(message);
 
                 if (index === array.length - 1) {
-                    this.isBooting = false;
-
-                    this.terminalInput?.removeAttribute('disabled');
+                    void this.runStartupCommand();
                 }
             }, index * 1200);
         });
+    }
+
+    private async runStartupCommand(): Promise<void> {
+        await this.renderQueue;
+        await this.commandHandler(StartupCommand);
+
+        this.isBooting = false;
+        this.terminalInput?.removeAttribute('disabled');
+        this.focusInputIfAllowed();
     }
 
     private runMachineSpiritBootSequence(): void {
@@ -635,7 +644,7 @@ class TerminalWindow extends HTMLElement {
         }
 
         this.isLoading = loading;
-        this.terminalInput?.setDisabled(loading);
+        this.terminalInput?.setDisabled(loading || this.isBooting);
     }
 
     private async focusInputAfterOutput(result: CommandResult): Promise<void> {
