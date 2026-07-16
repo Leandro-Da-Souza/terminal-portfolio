@@ -1,9 +1,9 @@
-import type { ProjectMetaData } from '../types/project.js'
+import type { ProjectMetaData } from '../types/project.js';
 
 export const FeaturedProjects: ProjectMetaData[] = [
     {
-        repo: 'examensarbete',
-        displayName: 'Plantera Mera',
+        repo: 'comboforge',
+        displayName: 'ComboForge',
         feature: true,
         priority: 1,
     },
@@ -14,15 +14,15 @@ export const FeaturedProjects: ProjectMetaData[] = [
         priority: 2,
     },
     {
-        repo: 'portfolio-two',
-        displayName: 'Developer Portfolio',
+        repo: 'examensarbete',
+        displayName: 'Plantera Mera',
         feature: true,
-        priority: 3
+        priority: 1,
     },
     {
         repo: 'airbean',
         displayName: 'Airbean',
         feature: true,
-        priority: 4, 
-    }
-]
+        priority: 4,
+    },
+];
