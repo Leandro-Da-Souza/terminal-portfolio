@@ -17,12 +17,18 @@ export const FeaturedProjects: ProjectMetaData[] = [
         repo: 'examensarbete',
         displayName: 'Plantera Mera',
         feature: true,
-        priority: 1,
+        priority: 3,
     },
     {
         repo: 'airbean',
         displayName: 'Airbean',
         feature: true,
         priority: 4,
+    },
+    {
+        repo: 'grammer-assistant',
+        displayName: 'Grammer Assistant',
+        feature: true,
+        priority: 5,
     },
 ];
