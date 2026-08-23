@@ -6,6 +6,9 @@ const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
 });
 
+const GITHUB_USERNAME = 'Leandro-Da-Souza';
+const GITHUB_ORGANIZATIONS = ['null-inc'];
+
 function normalizeRepoName(value: string): string {
     return value
         .toLowerCase()
@@ -23,12 +26,25 @@ export async function getRepositories(): Promise<PortfolioProject[]> {
     }
 
     try {
-        const response = await octokit.request('GET /users/{username}/repos', {
-            username: 'Leandro-Da-Souza',
-            per_page: 100,
-        });
+        const [userResponse, ...organizationResponses] = await Promise.all([
+            octokit.request('GET /users/{username}/repos', {
+                username: GITHUB_USERNAME,
+                per_page: 100,
+            }),
+            ...GITHUB_ORGANIZATIONS.map((org) =>
+                octokit.request('GET /orgs/{org}/repos', {
+                    org,
+                    per_page: 100,
+                })
+            ),
+        ]);
 
-        const repositories = response.data.map(
+        const repositoryData = [
+            ...userResponse.data,
+            ...organizationResponses.flatMap((response) => response.data),
+        ];
+
+        const repositories = repositoryData.map(
             (repo) =>
                 ({
                     name: repo.name,
