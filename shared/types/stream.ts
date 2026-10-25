@@ -1,4 +1,4 @@
-import type { CommandVariant } from './command';
+import type { CommandVariant } from './command.js';
 
 export type StreamMessage = {
     type: 'message' | 'complete' | 'error';

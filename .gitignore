@@ -31,3 +31,9 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+# Local configuration and generated admin assets
+.env
+.env.*
+!.env.example
+**/adminjs-assets/
+**/.adminjs/

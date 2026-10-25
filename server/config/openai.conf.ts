@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './env.js';
 
 export const OPENAI_CLIENT_CONFIG = {
     apiKey: process.env.OPENAI_API_KEY,

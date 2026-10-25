@@ -4,7 +4,19 @@
         "module": "nodenext",
         "moduleResolution": "nodenext",
         "strict": true,
-	    "rootDir": "../",
-	    "outDir": "./dist"
-    }
+        "rootDir": "../",
+        "outDir": "./dist",
+        "skipLibCheck": true,
+        "types": ["node"]
+    },
+    "include": [
+        "server.ts",
+        "app.ts",
+        "admin/**/*.ts",
+        "commands/**/*.ts",
+        "config/**/*.ts",
+        "services/**/*.ts",
+        "../shared/types/**/*.ts"
+    ],
+    "exclude": ["node_modules", "dist", "tests", "scripts", "prisma", "prisma.config.ts"]
 }

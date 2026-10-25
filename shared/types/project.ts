@@ -1,22 +1,18 @@
+export type ProjectCuration = {
+    id: string;
+    owner: string;
+    repo: string;
+    displayName: string;
+    featured: boolean;
+    position: number;
+};
+
 export type GithubRepository = {
-    name: string,
-    description: string | null,
-    url: string
-    topics: string[]
-}
-
-export type ProjectMetaData = {
-    repo: string,
-    displayName: string
-    feature: boolean,
-    priority: number,
-}
-
-export type PortfolioProject = {
-    name: string;
     description: string | null;
-    displayName: string
     url: string;
-    priority: number;
-    topics: string[]
-}
+    topics: string[];
+};
+
+export type PortfolioProject = ProjectCuration & {
+    metadata: GithubRepository | null;
+};

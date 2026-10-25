@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ContentSection {
+  key       String   @id @db.VarChar(32)
+  body      String   @db.Text
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+model FeaturedProject {
+  id          String   @id @default(cuid())
+  owner       String   @db.VarChar(39)
+  repo        String   @db.VarChar(100)
+  displayName String   @db.VarChar(120)
+  featured    Boolean  @default(false)
+  position    Int      @unique
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  @@unique([owner, repo])
+}
+
+// Exact column names/types expected by connect-pg-simple. Never an admin resource.
+model AdminSession {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire])
+  @@map("admin_session")
+}

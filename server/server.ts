@@ -1,101 +1,52 @@
-import express from 'express';
+import './config/env.js';
 import path from 'node:path';
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { repositoryRoot } from './config/env.js';
+import { createApp } from './app.js';
+import { createDatabase } from './services/database.js';
+import { createContentService, prismaContentStore } from './services/content.js';
+import { createGithubService, githubFetcher } from './services/github.js';
+import { createPortfolioService } from './services/portfolio.js';
+import { createServerCommandRegistry } from './commands/server-registry.js';
+import { createMachineSpirit } from './services/openai.js';
+import { createAdmin, adminConfigFromEnv } from './admin/index.js';
 
-import rateLimit from 'express-rate-limit';
-import 'dotenv/config';
-import type { Request, Response } from 'express';
-import type { CommandResult, ParsedCommand } from '../shared/types/command.js';
-import { ServerCommandRegistry } from './commands/server-registry.js';
-import { askMachineSpirit } from './services/openai.js';
-
-const app = express();
-const PORT = 3001;
-const clientDistPath =
-    process.env.NODE_ENV === 'production'
-        ? path.resolve(__dirname, '../../../client/dist')
-        : path.resolve(__dirname, '../client/dist');
-
-console.log(clientDistPath);
-
-app.use(express.static(clientDistPath));
-app.use(express.json());
-
-const rateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 5,
-    standardHeaders: true,
-});
-
-app.post('/terminal/command', async (req: Request, res: Response) => {
-    const { command } = req.body;
-
-    if (typeof command !== 'string') {
-        return handleCommandError(res, 400, 'Invalid command payload.');
-    }
-
-    const parsedCommand = parseCommand(command);
-    const commandDef = ServerCommandRegistry[parsedCommand.name];
-
-    if (!commandDef) {
-        return handleCommandError(res, 404, 'Unknown server command.');
-    }
-
-    try {
-        const result = await commandDef.execute(parsedCommand.args);
-
-        return res.json(result);
-    } catch {
-        return handleCommandError(res, 500, 'Failed To Execute command');
-    }
-});
-
-
-app.post('/terminal/machine-spirit', rateLimiter, async (req: Request, res: Response) => {
-    const { query } = req.body;
-
-    if (typeof query !== 'string') {
-        return handleCommandError(res, 400, 'Invalid machine spirit payload.');
-    }
-
-    try {
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        res.setHeader('Cache-Control', 'no-cache');
-
-        const stream = await askMachineSpirit(query);
-
-        for await (const event of stream) {
-            if (event.type === 'response.output_text.delta') {
-                res.write(event.delta);
-            }
-        }
-
-        return res.end();
-    } catch {
-        if (res.headersSent) {
-            return res.end();
-        }
-
-        return handleCommandError(res, 500, 'Machine spirit unavailable.');
-    }
-});
-
-function parseCommand(command: string): ParsedCommand {
-    const [name = '', ...args] = command.trim().toLocaleLowerCase().split(/\s+/);
-
-    return { name, args };
+async function start() {
+    const config = adminConfigFromEnv();
+    const port = Number(process.env.PORT ?? 3001);
+    const trustProxy = Number(process.env.TRUST_PROXY ?? 0);
+    if (!Number.isInteger(port) || port < 1 || port > 65535 || ![0, 1].includes(trustProxy))
+        throw new Error('Invalid PORT or TRUST_PROXY configuration.');
+    const db = createDatabase();
+    const content = createContentService(prismaContentStore(db));
+    const portfolio = createPortfolioService(
+        content,
+        createGithubService(githubFetcher(process.env.GITHUB_TOKEN))
+    );
+    const admin = await createAdmin(db, content, process.env.DATABASE_URL!, config);
+    const app = createApp({
+        commands: createServerCommandRegistry(portfolio),
+        askMachineSpirit: createMachineSpirit(portfolio),
+        adminRouter: admin.router,
+        clientDistPath: path.join(repositoryRoot, 'client/dist'),
+        trustProxy,
+    });
+    const server = app.listen(port, '0.0.0.0', () =>
+        console.log(`Terminal: http://localhost:${port} | Editor: ${config.origin}/admin`)
+    );
+    const shutdown = () =>
+        server.close(async () => {
+            await admin.close();
+            await db.$disconnect();
+            process.exit(0);
+        });
+    process.once('SIGINT', shutdown);
+    process.once('SIGTERM', shutdown);
 }
-
-function handleCommandError(response: Response, status: number, output: string) {
-    return response.status(status).json({
-        type: 'output',
-        output: output ?? 'Unknown server error',
-        variant: 'system',
-    } satisfies CommandResult);
-}
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+start().catch((error: unknown) => {
+    console.error(
+        error instanceof Error && /^(Configure ADMIN|Invalid PORT|DATABASE_URL)/.test(error.message)
+            ? error.message
+            : 'Startup failed. Check configuration, dependencies, and database availability.'
+    );
+    process.exitCode = 1;
 });

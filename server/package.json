@@ -7,26 +7,54 @@
     "type": "module",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "tsx --test tests/*.test.ts",
         "format": "prettier --write .",
         "dev": "NODE_ENV=development tsx watch server.ts",
-        "build": "tsc",
-        "start": "NODE_ENV=production node dist/server/server.js"
+        "build": "prisma generate && tsc",
+        "start": "NODE_ENV=production node dist/server/server.js",
+        "db:generate": "prisma generate",
+        "db:migrate": "prisma migrate dev",
+        "db:deploy": "prisma migrate deploy",
+        "db:status": "prisma migrate status",
+        "db:seed": "prisma db seed",
+        "content:context": "tsx scripts/context.ts",
+        "admin:password": "tsx scripts/admin-password.ts",
+        "test:db": "tsx --test --test-concurrency=1 tests/database.integration.ts",
+        "test:browser": "RUN_BROWSER_QA=1 tsx --test --test-concurrency=1 tests/database.integration.ts"
     },
     "dependencies": {
+        "@adminjs/express": "6.1.1",
+        "@adminjs/prisma": "5.0.4",
+        "@prisma/client": "6.19.3",
+        "adminjs": "7.8.17",
+        "connect-pg-simple": "10.0.0",
         "cors": "^2.8.6",
         "dotenv": "^17.4.2",
         "express": "^5.2.1",
+        "express-formidable": "1.2.0",
         "express-rate-limit": "^8.5.2",
+        "express-session": "1.19.0",
         "octokit": "^5.0.5",
-        "openai": "^6.41.0"
+        "openai": "^6.41.0",
+        "pg": "8.23.1",
+        "tslib": "2.8.1"
     },
     "devDependencies": {
+        "@playwright/test": "1.64.1",
+        "@types/connect-pg-simple": "7.0.3",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
+        "@types/express-session": "1.19.0",
         "@types/node": "^25.8.0",
+        "@types/pg": "8.23.1",
+        "@types/supertest": "7.2.1",
         "prettier": "^3.8.3",
+        "prisma": "6.19.3",
+        "supertest": "7.3.1",
         "tsx": "^4.22.1",
         "typescript": "^6.0.3"
+    },
+    "engines": {
+        "node": "^22.12.0 || ^24.0.0"
     }
 }

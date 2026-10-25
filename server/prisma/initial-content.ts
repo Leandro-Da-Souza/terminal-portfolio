@@ -1,4 +1,4 @@
-export const PortfolioData = {
+const portfolio = {
     about: `
 Leandro Da Souza
 Software developer based in Stockholm, Sweden.
@@ -83,5 +83,52 @@ https://linkedin.com/in/leandro-da-souza
 
 Email
 dasouza.leandro@gmail.com`.trim(),
-    
-}
+};
+export const initialSections = [
+    ...Object.entries(portfolio).map(([key, body]) => ({ key, body })),
+    { key: 'interests', body: '- Coding\n- Running\n- Reading\n- Muay Thai' },
+];
+
+// Owners verified through GitHub's repository API on 2026-10-24.
+export const initialProjects = [
+    {
+        id: 'seed-comboforge',
+        owner: 'leandro-da-souza',
+        repo: 'comboforge',
+        displayName: 'ComboForge',
+        featured: true,
+        position: 1,
+    },
+    {
+        id: 'seed-terminal-portfolio',
+        owner: 'leandro-da-souza',
+        repo: 'terminal-portfolio',
+        displayName: 'Terminal Portfolio',
+        featured: true,
+        position: 2,
+    },
+    {
+        id: 'seed-examensarbete',
+        owner: 'leandro-da-souza',
+        repo: 'examensarbete',
+        displayName: 'Plantera Mera',
+        featured: true,
+        position: 3,
+    },
+    {
+        id: 'seed-airbean',
+        owner: 'leandro-da-souza',
+        repo: 'airbean',
+        displayName: 'Airbean',
+        featured: true,
+        position: 4,
+    },
+    {
+        id: 'seed-grammer-assistant',
+        owner: 'null-inc',
+        repo: 'grammer-assistant',
+        displayName: 'Grammer Assistant',
+        featured: true,
+        position: 5,
+    },
+];
