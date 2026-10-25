@@ -1,6 +1,6 @@
 import './env.js';
 
-const reasoningEfforts = ['none', 'low', 'medium', 'high', 'xhigh', 'max'] as const;
+const reasoningEfforts = ['none', 'low', 'medium', 'high', 'xhigh'] as const;
 
 const configuredEffort = process.env.OPEN_AI_REASONING_EFFORT?.trim() ?? 'none';
 
