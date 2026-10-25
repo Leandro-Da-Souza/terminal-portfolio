@@ -82,7 +82,7 @@ section.terminal-window[data-mode='machine-spirit']::before {
 
     opacity: 0.88;
 
-    animation: machineSpiritScanlines 6.5s linear infinite;
+    animation: none;
 }
 
 section.terminal-window::after {
@@ -126,11 +126,80 @@ section.terminal-window[data-mode='machine-spirit']::after {
             transparent 76%
         );
 
-    opacity: 0.13;
+    opacity: 0.09;
 
     mix-blend-mode: screen;
 
-    animation: signalInterference 4.8s ease-in-out infinite;
+    animation: none;
+}
+
+.signal-noise,
+.signal-band {
+    position: absolute;
+    pointer-events: none;
+    display: none;
+    z-index: 2;
+    background: transparent;
+}
+
+.signal-noise {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    opacity: 0.022;
+    image-rendering: pixelated;
+}
+
+.signal-band {
+    top: var(--band-top, 50%);
+    left: 0;
+    width: 100%;
+    height: var(--band-height, 40px);
+    transform: translateX(var(--band-offset, 0px));
+    opacity: 0;
+    background:
+        linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.18) 12%, transparent 24%),
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.13) 0px,
+            rgba(255, 255, 255, 0.13) 1px,
+            transparent 2px,
+            transparent 4px
+        );
+    box-shadow:
+        0 -2px 5px rgba(0, 0, 0, 0.3),
+        0 3px 6px rgba(0, 0, 0, 0.32);
+}
+
+section.terminal-window[data-mode='machine-spirit'] .signal-noise,
+section.terminal-window[data-mode='machine-spirit'] .signal-band {
+    display: block;
+}
+
+section.terminal-window[data-mode='machine-spirit'].signal-static .signal-noise {
+    opacity: 0.23;
+}
+
+section.terminal-window[data-mode='machine-spirit'].signal-band-active .signal-band {
+    opacity: 1;
+}
+
+section.terminal-window[data-mode='machine-spirit'].signal-slip main {
+    transform: translateX(1px);
+    text-shadow:
+        -1px 0 rgba(255, 65, 65, 0.22),
+        1px 0 rgba(75, 220, 255, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    section.terminal-window[data-mode='machine-spirit'] .signal-noise {
+        opacity: 0.016;
+    }
+
+    section.terminal-window[data-mode='machine-spirit'] .signal-band {
+        display: none;
+    }
 }
 
 main {
@@ -284,39 +353,6 @@ section.terminal-overlay {
 
     to {
         transform: translateY(14px);
-    }
-}
-
-@keyframes machineSpiritScanlines {
-    from {
-        transform: translateY(0);
-    }
-
-    to {
-        transform: translateY(10px);
-    }
-}
-
-@keyframes signalInterference {
-    0%,
-    100% {
-        opacity: 0.08;
-        transform: translateX(0);
-    }
-
-    24% {
-        opacity: 0.15;
-        transform: translateX(0.85px);
-    }
-
-    47% {
-        opacity: 0.1;
-        transform: translateX(-1px);
-    }
-
-    71% {
-        opacity: 0.17;
-        transform: translateX(0.65px);
     }
 }
 

@@ -143,11 +143,20 @@ export async function browserChecks(
         await expect(page.locator('.terminal-window')).toHaveClass(/closed/, { timeout: 10_000 });
         await page.locator('.reboot-button').click();
         await expect(input).toBeEnabled();
+        await expect(page.locator('.terminal-window')).not.toHaveClass(/opening/);
         await command('machine-spirit');
         await expect(page.locator('.terminal-window')).toHaveAttribute(
             'data-mode',
             'machine-spirit'
         );
+        await expect(page.locator('.signal-noise')).toHaveCSS('display', 'block');
+        await expect(page.locator('.signal-noise')).toHaveCSS('pointer-events', 'none');
+        await expect(page.locator('.signal-band')).toHaveCSS('pointer-events', 'none');
+        if (process.env.QA_SCREENSHOTS === '1')
+            await page.screenshot({ path: '/tmp/portfolio-machine-spirit-on.png', fullPage: true });
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await expect(page.locator('.signal-noise')).toHaveCSS('opacity', '0.016');
+        await page.emulateMedia({ reducedMotion: 'no-preference' });
         await command('Who is Leandro?');
         await expect(page.locator('terminal-entry .output').last()).toHaveText(
             'Offline test response.',
@@ -158,6 +167,16 @@ export async function browserChecks(
             'data-mode',
             'machine-spirit'
         );
+        await expect(page.locator('.signal-noise')).toHaveCSS('display', 'none');
+        if (process.env.QA_SCREENSHOTS === '1')
+            await page.screenshot({
+                path: '/tmp/portfolio-machine-spirit-off.png',
+                fullPage: true,
+            });
+        await command('machine-spirit');
+        await expect(page.locator('.signal-noise')).toHaveCSS('display', 'block');
+        await command('exit');
+        await expect(page.locator('.signal-noise')).toHaveCSS('display', 'none');
         await page.goto(`${origin}/admin/logout`);
         await expect(page).toHaveURL(`${origin}/admin/login`);
         await page.goto(`${origin}/admin/resources/ContentSection`);

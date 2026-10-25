@@ -79,6 +79,12 @@ class TerminalWindow extends HTMLElement {
 
     private machineSpiritEndpoint: string | null = null;
 
+    private signalCanvas: HTMLCanvasElement | null = null;
+
+    private signalTimer: number | null = null;
+
+    private reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     connectedCallback() {
         this.render();
 
@@ -96,8 +102,10 @@ class TerminalWindow extends HTMLElement {
         ) as TerminalHeaderElement | null;
         this.tooltipElement = this.shadowRoot!.querySelector('.tooltip') as HTMLElement | null;
         this.rebootButton = this.shadowRoot!.querySelector('.reboot-button') as HTMLElement | null;
+        this.signalCanvas = this.shadowRoot!.querySelector('.signal-noise');
 
         this.setMachineSpiritMode(false);
+        this.reducedMotion.addEventListener('change', this.handleMotionPreference);
         this.attachEventListeners();
         this.attachViewportListeners();
         this.updateKeyboardInset();
@@ -107,6 +115,8 @@ class TerminalWindow extends HTMLElement {
     }
 
     disconnectedCallback(): void {
+        this.stopSignal();
+        this.reducedMotion.removeEventListener('change', this.handleMotionPreference);
         window.removeEventListener('keydown', this.handleKeydown);
 
         this.terminalElement?.removeEventListener('animationend', this.handleAnimationEnd);
@@ -143,6 +153,8 @@ class TerminalWindow extends HTMLElement {
                         ${this.isBooting ? 'disabled' : ''}
                     ></terminal-input>
                 </main>
+                <canvas class="signal-noise" width="512" height="288" aria-hidden="true"></canvas>
+                <div class="signal-band" aria-hidden="true"></div>
             </section>
         `;
     }
@@ -614,12 +626,110 @@ class TerminalWindow extends HTMLElement {
             this.terminalElement?.setAttribute('data-mode', 'machine-spirit');
             this.terminalHeader?.setAttribute('mode', 'machine-spirit');
             this.setTooltipText("Type 'exit' to leave Machine Spirit mode.");
+            this.startSignal();
             return;
         }
 
+        this.stopSignal();
         this.terminalElement?.removeAttribute('data-mode');
         this.terminalHeader?.removeAttribute('mode');
         this.setTooltipText("Type 'help' to see available commands.");
+    }
+
+    private handleMotionPreference = (): void => {
+        if (this.activeMode !== 'machine-spirit') return;
+
+        this.stopSignal();
+        this.startSignal();
+    };
+
+    private startSignal(): void {
+        if (this.signalTimer !== null || !this.signalCanvas) return;
+
+        this.drawSignalNoise();
+        if (!this.reducedMotion.matches) this.scheduleSignalFault();
+    }
+
+    private stopSignal(): void {
+        if (this.signalTimer !== null) window.clearTimeout(this.signalTimer);
+        this.signalTimer = null;
+        this.terminalElement?.classList.remove(
+            'signal-static',
+            'signal-slip',
+            'signal-band-active'
+        );
+        if (this.signalCanvas) {
+            this.signalCanvas
+                .getContext('2d')
+                ?.clearRect(0, 0, this.signalCanvas.width, this.signalCanvas.height);
+        }
+    }
+
+    private drawSignalNoise(): void {
+        const canvas = this.signalCanvas;
+        const context = canvas?.getContext('2d', { alpha: false });
+        if (!canvas || !context) return;
+
+        const frame = context.createImageData(canvas.width, canvas.height);
+        const pixels = frame.data;
+        for (let index = 0; index < pixels.length; index += 4) {
+            const shade = Math.random() < 0.5 ? 0 : 255;
+            pixels[index] = shade;
+            pixels[index + 1] = shade;
+            pixels[index + 2] = shade;
+            pixels[index + 3] = 255;
+        }
+        context.putImageData(frame, 0, 0);
+    }
+
+    private scheduleSignalFault(): void {
+        this.signalTimer = window.setTimeout(
+            () => {
+                this.signalTimer = null;
+                if (Math.random() < 0.62) {
+                    this.runStaticBurst(2 + Math.floor(Math.random() * 4));
+                } else {
+                    this.runInterferenceBand();
+                }
+            },
+            4200 + Math.random() * 9000
+        );
+    }
+
+    private runStaticBurst(framesLeft: number): void {
+        this.terminalElement?.classList.add('signal-static');
+        this.terminalElement?.classList.toggle('signal-slip', Math.random() < 0.5);
+        this.drawSignalNoise();
+        this.signalTimer = window.setTimeout(
+            () => {
+                this.signalTimer = null;
+                if (framesLeft > 1) {
+                    this.runStaticBurst(framesLeft - 1);
+                } else {
+                    this.terminalElement?.classList.remove('signal-static', 'signal-slip');
+                    this.drawSignalNoise();
+                    this.scheduleSignalFault();
+                }
+            },
+            45 + Math.random() * 40
+        );
+    }
+
+    private runInterferenceBand(): void {
+        const band = this.shadowRoot?.querySelector<HTMLElement>('.signal-band');
+        band?.style.setProperty('--band-top', `${8 + Math.random() * 80}%`);
+        band?.style.setProperty('--band-height', `${16 + Math.random() * 62}px`);
+        band?.style.setProperty('--band-offset', `${(Math.random() - 0.5) * 22}px`);
+        this.terminalElement?.classList.add('signal-band-active');
+        this.terminalElement?.classList.toggle('signal-slip', Math.random() < 0.6);
+        this.signalTimer = window.setTimeout(
+            () => {
+                this.signalTimer = null;
+                this.terminalElement?.classList.remove('signal-band-active', 'signal-slip');
+                this.scheduleSignalFault();
+            },
+            110 + Math.random() * 180
+        );
     }
 
     private setTooltipText(text: string): void {
@@ -675,7 +785,6 @@ class TerminalWindow extends HTMLElement {
 
         favicon.href = `/${theme}.ico`;
     }
-
 }
 
 TerminalWindow.define();
